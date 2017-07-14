@@ -14,12 +14,14 @@ public class AppService extends Service {
     WatekMiniatury watekminiatury;
     WatekWczytaj watekwczytaj;
     WatekRysuj watekrysuj;
+    WatekOdlicz watekodlicz;
 
     public AppService() {
         wateklistujpliki = null;
         watekminiatury = null;
         watekwczytaj = null;
         watekrysuj = null;
+        watekodlicz = null;
         service = this;
     }
 
@@ -35,10 +37,12 @@ public class AppService extends Service {
             watekminiatury = new WatekMiniatury();
             watekwczytaj = new WatekWczytaj();
             watekrysuj = new WatekRysuj();
+            watekodlicz = new WatekOdlicz();
             wateklistujpliki.start();
             watekminiatury.start();
             watekwczytaj.start();
             watekrysuj.start();
+            watekodlicz.start();
             watekwczytaj.przeladuj = true;
             watekrysuj.odswiez = true;
         }
@@ -64,6 +68,7 @@ public class AppService extends Service {
 
     private void zakonczWatekMiniatury() {
         watekminiatury.zakoncz = true;
+        watekminiatury.przerwij = true;
         watekminiatury.interrupt();
         while(watekminiatury.isAlive()) {
             try {
@@ -95,6 +100,17 @@ public class AppService extends Service {
         }
     }
 
+    private void zakonczWatekOdlicz() {
+        watekodlicz.zakoncz = true;
+        watekodlicz.interrupt();
+        while(watekodlicz.isAlive()) {
+            try {
+                watekodlicz.join();
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -102,6 +118,7 @@ public class AppService extends Service {
         zakonczWatekMiniatury();
         zakonczWatekWczytaj();
         zakonczWatekRysuj();
+        zakonczWatekOdlicz();
         Toast.makeText(MainActivity.activity.getApplicationContext(), "Zakonczono Pokaz2!", Toast.LENGTH_SHORT).show();
     }
 

@@ -49,10 +49,29 @@ public class WatekRysuj extends Thread {
         return new Rect(0, 0, bitmapa.getWidth(), bitmapa.getHeight());
     }
 
+    private boolean czyPionowyObraz(int dlugosc, int wysokosc) {
+        double ratio = (double)dlugosc / (double)wysokosc;
+        if(ratio < MainActivity.ratio) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private Rect wysrodkujRect(int dlugosc, int wysokosc) {
         Rect rect = new Rect();
-        rect.left = MainActivity.rozdzielczosc.x / 2 - dlugosc / 2;
-        rect.top = MainActivity.rozdzielczosc.y / 2 - wysokosc / 2;
+        int roznicawpoziomie = dlugosc - MainActivity.rozdzielczosc.x;
+        int roznicawpionie = wysokosc - MainActivity.rozdzielczosc.y;
+        int dx = 0;
+        int dy = 0;
+        if(roznicawpoziomie > 0) {
+            dx = (int)(((double)roznicawpoziomie / (double)40) * (double)MainActivity.xprzesun);
+        }
+        if(roznicawpionie > 0) {
+            dy = (int) (((double)roznicawpionie / (double)40) * (double)MainActivity.yprzesun);
+        }
+        rect.left = MainActivity.rozdzielczosc.x / 2 - dlugosc / 2 - dx;
+        rect.top = MainActivity.rozdzielczosc.y / 2 - wysokosc / 2 - dy;
         rect.right = rect.left + dlugosc;
         rect.bottom = rect.top + wysokosc;
         return rect;
@@ -112,8 +131,15 @@ public class WatekRysuj extends Thread {
             if(bitmapa != null) {
                 int dlugosc = bitmapa.getWidth();
                 int wysokosc = bitmapa.getHeight();
-                int docelowawysokosc = MainActivity.rozdzielczosc.y;
-                int docelowadlugosc = obliczDlugoscProporcjonalnie(dlugosc, wysokosc, docelowawysokosc);
+                int docelowadlugosc = 0;
+                int docelowawysokosc = 0;
+                if(czyPionowyObraz(dlugosc, wysokosc)) {
+                    docelowawysokosc = MainActivity.rozdzielczosc.y;
+                    docelowadlugosc = obliczDlugoscProporcjonalnie(dlugosc, wysokosc, docelowawysokosc);
+                } else {
+                    docelowadlugosc = MainActivity.rozdzielczosc.x;
+                    docelowawysokosc = obliczDlugoscProporcjonalnie(wysokosc, dlugosc, docelowadlugosc);
+                }
                 canvas = MainActivity.surface.surfaceHolder.lockCanvas();
                 canvas.drawColor(Color.BLACK);
                 canvas.drawBitmap(bitmapa, caloscBitmapyRect(bitmapa), wysrodkujRect(docelowadlugosc, docelowawysokosc), null);

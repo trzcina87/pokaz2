@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static MainActivity activity;
     public static Point rozdzielczosc;
+    public static double ratio;
     public static MainSurface surface;
 
     public static int poziominfo;
@@ -36,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     public static int ktoryplik;
     public static boolean trybopcji;
     public static String folderroboczy;
+
+    private volatile long ostatniapauza;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         jestemwfolderach = false;
         trybopcji = false;
         ktoryplik = 0;
+        ostatniapauza = 0;
     }
 
     private void ustawEkran() {
@@ -71,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         if (rozdzielczosc.y == 1008) {
             rozdzielczosc.y = 1080;
         }
+        ratio = (double)rozdzielczosc.x / (double)rozdzielczosc.y;
         setContentView(R.layout.activity_main);
     }
 
@@ -90,59 +95,208 @@ public class MainActivity extends AppCompatActivity {
         Widoki.przypiszAkcjeDoWidokow();
     }
 
+    public void resetujPrzesuj() {
+        xprzesun = 0;
+        yprzesun = 0;
+    }
 
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        int action = event.getAction();
-        int key = event.getKeyCode();
-        if (action == KeyEvent.ACTION_DOWN) {
-            if (Arrays.asList(Kody.ENTERY).contains(key)) {
-                if (!trybopcji) {
-                    Widoki.activitylayout.addView(Widoki.opcjelayout);
-                    Widoki.wypelnijOpcje();
-                    AppService.service.wateklistujpliki.focusnawstecz = false;
-                    AppService.service.wateklistujpliki.odswiezfoldery = true;
-                    trybopcji = true;
-                    return true;
-                }
+    private boolean obsluzEnter(int key) {
+        if (Arrays.asList(Kody.ENTERY).contains(key)) {
+            if (!trybopcji) {
+                Widoki.activitylayout.addView(Widoki.opcjelayout);
+                Widoki.wypelnijOpcje();
+                AppService.service.wateklistujpliki.focusnawstecz = false;
+                AppService.service.wateklistujpliki.odswiezfoldery = true;
+                trybopcji = true;
+                return true;
             }
-            if (Arrays.asList(Kody.LEWO).contains(key)) {
-                if((MainActivity.powiekszenie == 0) && (trybopcji == false)){
+        }
+        return false;
+    }
+
+    private boolean obsluzLewo(int key) {
+        if (Arrays.asList(Kody.LEWO).contains(key)) {
+            if(trybopcji == false) {
+                if (MainActivity.powiekszenie == 0) {
                     int iloscplikow = AppService.service.watekwczytaj.iloscplikow;
                     if (iloscplikow > 0) {
                         ktoryplik = ktoryplik - 1;
                         if (ktoryplik < 0) {
                             ktoryplik = iloscplikow - 1;
                         }
+                        resetujPrzesuj();
                     }
-                    AppService.service.watekrysuj.odswiez = true;
-                    return true;
+                } else {
+                    xprzesun = xprzesun - 1;
+                    if(xprzesun < -20) {
+                        xprzesun = -20;
+                    }
                 }
+                AppService.service.watekrysuj.odswiez = true;
+                return true;
             }
-            if (Arrays.asList(Kody.PRAWO).contains(key)) {
-                if((MainActivity.powiekszenie == 0) && (trybopcji == false)){
+        }
+        return false;
+    }
+
+    private boolean obsluzPrawo(int key) {
+        if (Arrays.asList(Kody.PRAWO).contains(key)) {
+            if(trybopcji == false) {
+                if (MainActivity.powiekszenie == 0) {
                     int iloscplikow = AppService.service.watekwczytaj.iloscplikow;
                     if (iloscplikow > 0) {
                         ktoryplik = ktoryplik + 1;
                         if (ktoryplik >= iloscplikow) {
                             ktoryplik = 0;
                         }
+                        resetujPrzesuj();
                     }
-                    AppService.service.watekrysuj.odswiez = true;
-                    return true;
+                } else {
+                    xprzesun = xprzesun + 1;
+                    if(xprzesun > 20) {
+                        xprzesun = 20;
+                    }
+                }
+                AppService.service.watekrysuj.odswiez = true;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean obsluzGora(int key) {
+        if (Arrays.asList(Kody.GORA).contains(key)) {
+            if(trybopcji == false) {
+                if(MainActivity.powiekszenie != 0) {
+                    yprzesun = yprzesun - 1;
+                    if(yprzesun < -20) {
+                        yprzesun = -20;
+                    }
+                }
+                AppService.service.watekrysuj.odswiez = true;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean obsluzDol(int key) {
+        if (Arrays.asList(Kody.DOL).contains(key)) {
+            if(trybopcji == false) {
+                if(MainActivity.powiekszenie != 0) {
+                    yprzesun = yprzesun + 1;
+                    if(yprzesun > 20) {
+                        yprzesun = 20;
+                    }
+                }
+                AppService.service.watekrysuj.odswiez = true;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean obsluzSto(int key) {
+        if (Arrays.asList(Kody.STO).contains(key)) {
+            MainActivity.powiekszenie = 100;
+            AppService.service.watekrysuj.odswiez = true;
+            return true;
+        }
+        return false;
+    }
+
+    private boolean obsluzOrg(int key) {
+        if (Arrays.asList(Kody.ORG).contains(key)) {
+            MainActivity.powiekszenie = 0;
+            AppService.service.watekrysuj.odswiez = true;
+            return true;
+        }
+        return false;
+    }
+
+    private boolean obsluzInfo(int key) {
+        if (Arrays.asList(Kody.INFO).contains(key)) {
+            MainActivity.poziominfo = (MainActivity.poziominfo + 1) % 5;
+            AppService.service.watekrysuj.odswiez = true;
+            return true;
+        }
+        return false;
+    }
+
+    private boolean obsluzSpacja(int key) {
+        if(trybopcji == false) {
+            if (Arrays.asList(Kody.SPACJA).contains(key)) {
+                if (OpcjeProgramu.pokazslidow == 1) {
+                    OpcjeProgramu.pokazslidow = 0;
+                    Ustawienia.zapiszUstawienie("pokazslidow", 0);
+                    ustawPlayPauza();
+                } else {
+                    OpcjeProgramu.pokazslidow = 1;
+                    Ustawienia.zapiszUstawienie("pokazslidow", 1);
+                    ustawPlayPauza();
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void ustawPlayPauza() {
+        final long lokalnaostatniapauza = System.currentTimeMillis();
+        ostatniapauza = lokalnaostatniapauza;
+        if(OpcjeProgramu.pokazslidow == 1) {
+            Widoki.imageviewplaypauza.setImageResource(R.mipmap.play);
+        } else {
+            Widoki.imageviewplaypauza.setImageResource(R.mipmap.pauza);
+        }
+        Widoki.imageviewplaypauza.setVisibility(View.VISIBLE);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Rozne.czekaj(2000);
+                if(ostatniapauza == lokalnaostatniapauza) {
+                    MainActivity.activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Widoki.imageviewplaypauza.setVisibility(View.INVISIBLE);
+                        }
+                    });
                 }
             }
-            if (Arrays.asList(Kody.STO).contains(key)) {
-                MainActivity.powiekszenie = 100;
-                AppService.service.watekrysuj.odswiez = true;
+        }).start();
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int action = event.getAction();
+        int key = event.getKeyCode();
+        if (action == KeyEvent.ACTION_DOWN) {
+            if(obsluzEnter(key)) {
+                return true;
+            };
+            if(obsluzLewo(key)) {
+                return true;
             }
-            if (Arrays.asList(Kody.ORG).contains(key)) {
-                MainActivity.powiekszenie = 0;
-                AppService.service.watekrysuj.odswiez = true;
+            if(obsluzPrawo(key)) {
+                return true;
             }
-            if (Arrays.asList(Kody.INFO).contains(key)) {
-                MainActivity.poziominfo = (MainActivity.poziominfo + 1) % 5;
-                AppService.service.watekrysuj.odswiez = true;
+            if(obsluzGora(key)) {
+                return true;
+            }
+            if(obsluzDol(key)) {
+                return true;
+            }
+            if(obsluzSto(key)) {
+                return true;
+            }
+            if(obsluzOrg(key)) {
+                return true;
+            }
+            if(obsluzInfo(key)) {
+                return true;
+            }
+            if(obsluzSpacja(key)) {
+                return true;
             }
         }
         return super.dispatchKeyEvent(event);

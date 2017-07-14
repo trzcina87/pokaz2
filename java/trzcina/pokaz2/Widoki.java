@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -20,11 +21,6 @@ import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.Comparator;
-
-import static android.view.Gravity.*;
 
 public class Widoki {
 
@@ -45,6 +41,7 @@ public class Widoki {
     public static LinearLayout layoutscrollviewminiatury;
     public static ProgressBar progressbaropcje;
     public static ImageView imageviewklepsydra;
+    public static ImageView imageviewplaypauza;
 
     public static void znajdzWidoki() {
         LayoutInflater inflater = LayoutInflater.from(MainActivity.activity.getApplicationContext());
@@ -66,6 +63,7 @@ public class Widoki {
         layoutscrollviewminiatury = (LinearLayout) opcjelayout.findViewById(R.id.layoutscrollviewminiatury);
         progressbaropcje = (ProgressBar) opcjelayout.findViewById(R.id.progressbaropcje);
         imageviewklepsydra = (ImageView) MainActivity.activity.findViewById(R.id.klepsydra);
+        imageviewplaypauza = (ImageView) MainActivity.activity.findViewById(R.id.playpauza);
     }
 
 
