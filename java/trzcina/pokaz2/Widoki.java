@@ -13,6 +13,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
@@ -30,6 +31,8 @@ public class Widoki {
     public static RelativeLayout activitylayout;
     public static Button buttonzapisz;
     public static Button buttonanuluj;
+    public static Button buttonobudzte;
+    public static Button buttonmontujte;
     public static CheckBox checkboxpokazslidow;
     public static CheckBox checkboxlosuj;
     public static RadioButton radiobuttonczas2s;
@@ -48,6 +51,8 @@ public class Widoki {
         activitylayout = (RelativeLayout) MainActivity.activity.findViewById(R.id.activity_main);
         buttonzapisz = (Button) opcjelayout.findViewById(R.id.buttonzapisz);
         buttonanuluj = (Button) opcjelayout.findViewById(R.id.buttonanuluj);
+        buttonobudzte = (Button) opcjelayout.findViewById(R.id.buttonobudzte);
+        buttonmontujte = (Button) opcjelayout.findViewById(R.id.buttonmontujte);
         checkboxlosuj = (CheckBox) opcjelayout.findViewById(R.id.checkboxlosuj);
         checkboxpokazslidow = (CheckBox) opcjelayout.findViewById(R.id.checkboxpokazslidow);
         radiobuttonczas2s = (RadioButton) opcjelayout.findViewById(R.id.radiobutton2s);
@@ -79,6 +84,34 @@ public class Widoki {
         }
     }
 
+    private static void obudzteClick() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                WakeOnLan.wyslijWOL(WakeOnLan.TEMAC);
+            }
+        }).start();
+    }
+
+    private static void montujteClick() {
+        boolean hostzyje = Proces.dostepnoscIP(WakeOnLan.TEIP);
+        if(hostzyje == false) {
+            MainActivity.wyswietlToast("Host " + WakeOnLan.TEIP + " nie odpowiada!");
+            AppService.service.wateklistujpliki.montowaniete = null;
+        } else {
+            Long milisekundy = System.currentTimeMillis();
+            String milisek = String.valueOf(milisekundy);
+            boolean wynikmontowania = Proces.montuj(milisekundy);
+            if(wynikmontowania == true) {
+                AppService.service.wateklistujpliki.montowaniete = "/sdcard/" + milisek + "/" + milisek + "/" + milisek + "/";
+                MainActivity.wyswietlToast("Zamontowano " + WakeOnLan.TEIP);
+            } else {
+                AppService.service.wateklistujpliki.montowaniete = null;
+                MainActivity.wyswietlToast("Błąd podczas montowania " + WakeOnLan.TEIP);
+            }
+        }
+    }
+
     public static void przypiszAkcjeDoWidokow() {
         buttonzapisz.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,6 +123,18 @@ public class Widoki {
             @Override
             public void onClick(View view) {
                 anulujClick();
+            }
+        });
+        buttonobudzte.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                obudzteClick();
+            }
+        });
+        buttonmontujte.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                montujteClick();
             }
         });
     }

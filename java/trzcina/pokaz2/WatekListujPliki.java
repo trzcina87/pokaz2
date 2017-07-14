@@ -21,12 +21,14 @@ public class WatekListujPliki extends Thread {
     public volatile boolean zajety;
     public volatile boolean odswiezfoldery;
     public volatile boolean focusnawstecz;
+    public volatile String montowaniete;
 
     public WatekListujPliki() {
         zakoncz = false;
         zajety = false;
         odswiezfoldery = false;
         focusnawstecz = false;
+        montowaniete = null;
     }
 
     private static void wyczyscScroolView() {
@@ -66,7 +68,7 @@ public class WatekListujPliki extends Thread {
         return layoutminiatury;
     }
 
-    private static ImageButton utworzObrazMiniatury(Bitmap bitmapa, final boolean katalog, String tag) {
+    private ImageButton utworzObrazMiniatury(Bitmap bitmapa, final boolean katalog, String tag) {
         ImageButton obrazminiatury = new ImageButton(MainActivity.activity.getApplicationContext());
         obrazminiatury.setTag(tag);
         obrazminiatury.setBackgroundColor(Color.WHITE);
@@ -94,9 +96,19 @@ public class WatekListujPliki extends Thread {
                     if(AppService.service.wateklistujpliki.zajety) {
                         MainActivity.wyswietlToast("Zaczekaj na wczytanie plikow!");
                     } else {
-                        MainActivity.folderroboczy = (String) view.getTag();
-                        AppService.service.wateklistujpliki.focusnawstecz = true;
-                        AppService.service.wateklistujpliki.odswiezfoldery = true;
+                        if(((String)(view.getTag())).equals("SERWERTE")) {
+                            if(montowaniete == null) {
+                                MainActivity.wyswietlToast("Udział nie zamontowany!");
+                            } else {
+                                MainActivity.folderroboczy = montowaniete;
+                                AppService.service.wateklistujpliki.focusnawstecz = true;
+                                AppService.service.wateklistujpliki.odswiezfoldery = true;
+                            }
+                        } else {
+                            MainActivity.folderroboczy = (String) view.getTag();
+                            AppService.service.wateklistujpliki.focusnawstecz = true;
+                            AppService.service.wateklistujpliki.odswiezfoldery = true;
+                        }
                     }
                 } else {
                     MainActivity.trybopcji = false;
@@ -122,7 +134,7 @@ public class WatekListujPliki extends Thread {
         return podpisminiatury;
     }
 
-    private static LinearLayout utworzMiniature(String podpis, Bitmap bitmapa, boolean katalog, String tag) {
+    private LinearLayout utworzMiniature(String podpis, Bitmap bitmapa, boolean katalog, String tag) {
         LinearLayout layoutminiatury = stworzLayoutMiniatury();
         ImageButton obrazminiatury = utworzObrazMiniatury(bitmapa, katalog, tag);
         layoutminiatury.addView(obrazminiatury);
@@ -153,6 +165,12 @@ public class WatekListujPliki extends Thread {
             miniaturawstecz.requestFocus();
         }
         MainActivity.dodajViewDoView(rzadminiatur, miniaturawstecz);
+        iloscminiatur = iloscminiatur + 1;
+        LinearLayout miniaturasieciowa = utworzMiniature("TE", Bitmapy.foldersieciowybitmap, true, "SERWERTE");
+        MainActivity.dodajViewDoView(rzadminiatur, miniaturasieciowa);
+        iloscminiatur = iloscminiatur + 1;
+        LinearLayout miniaturaroot = utworzMiniature("/", Bitmapy.folderroot, true, "/");
+        MainActivity.dodajViewDoView(rzadminiatur, miniaturaroot);
         iloscminiatur = iloscminiatur + 1;
         if(plikiobecne != null) {
             sortujPliki(plikiobecne);
