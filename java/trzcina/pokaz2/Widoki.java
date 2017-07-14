@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.ProgressBar;
@@ -43,6 +44,7 @@ public class Widoki {
     public static EditText edittextfolder;
     public static LinearLayout layoutscrollviewminiatury;
     public static ProgressBar progressbaropcje;
+    public static ImageView imageviewklepsydra;
 
     public static void znajdzWidoki() {
         LayoutInflater inflater = LayoutInflater.from(MainActivity.activity.getApplicationContext());
@@ -63,12 +65,15 @@ public class Widoki {
         edittextfolder = (EditText) opcjelayout.findViewById(R.id.edittextfolder);
         layoutscrollviewminiatury = (LinearLayout) opcjelayout.findViewById(R.id.layoutscrollviewminiatury);
         progressbaropcje = (ProgressBar) opcjelayout.findViewById(R.id.progressbaropcje);
+        imageviewklepsydra = (ImageView) MainActivity.activity.findViewById(R.id.klepsydra);
     }
+
 
     private static void zapiszClick() {
         if(AppService.service.wateklistujpliki.zajety == true) {
             MainActivity.wyswietlToast("Zaczekaj na wczytanie plikow!");
         } else {
+            WatekMiniatury.przerwijMiniatury();
             MainActivity.trybopcji = false;
             OpcjeProgramu.zapiszOpcje();
             AppService.service.watekwczytaj.przeladuj = true;
@@ -81,6 +86,7 @@ public class Widoki {
         if(AppService.service.wateklistujpliki.zajety == true) {
             MainActivity.wyswietlToast("Zaczekaj na wczytanie plikow!");
         } else {
+            WatekMiniatury.przerwijMiniatury();
             MainActivity.trybopcji = false;
             activitylayout.removeView(opcjelayout);
         }

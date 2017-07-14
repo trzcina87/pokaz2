@@ -100,17 +100,20 @@ public class WatekListujPliki extends Thread {
                             if(montowaniete == null) {
                                 MainActivity.wyswietlToast("Udział nie zamontowany!");
                             } else {
+                                WatekMiniatury.przerwijMiniatury();
                                 MainActivity.folderroboczy = montowaniete;
                                 AppService.service.wateklistujpliki.focusnawstecz = true;
                                 AppService.service.wateklistujpliki.odswiezfoldery = true;
                             }
                         } else {
+                            WatekMiniatury.przerwijMiniatury();
                             MainActivity.folderroboczy = (String) view.getTag();
                             AppService.service.wateklistujpliki.focusnawstecz = true;
                             AppService.service.wateklistujpliki.odswiezfoldery = true;
                         }
                     }
                 } else {
+                    WatekMiniatury.przerwijMiniatury();
                     MainActivity.trybopcji = false;
                     OpcjeProgramu.zapiszOpcje();
                     AppService.service.watekwczytaj.przeladuj = true;
@@ -201,13 +204,13 @@ public class WatekListujPliki extends Thread {
 
     public void run() {
         while(zakoncz == false) {
-            Rozne.czekaj(10);
+            Rozne.czekaj(1);
             if(odswiezfoldery == true) {
                 zajety = true;
                 MainActivity.widocznoscPostepuOpcje(View.VISIBLE, Color.RED);
                 wyswietlZawartoscFolderu();
                 MainActivity.widocznoscPostepuOpcje(View.INVISIBLE, Color.RED);
-                AppService.service.watekminiatury.odswiezminiatury = true;
+                AppService.service.watekminiatury.odswiezminiatury = System.currentTimeMillis();
                 odswiezfoldery = false;
                 zajety = false;
             }

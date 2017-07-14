@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.media.ExifInterface;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,13 +17,19 @@ public class WatekMiniatury extends Thread {
 
     public volatile boolean zakoncz;
     public volatile boolean zajety;
-    public volatile boolean odswiezminiatury;
+    public volatile long odswiezminiatury;
+    public volatile long odswiezylemminiatury;
     public volatile boolean przerwij;
 
     public WatekMiniatury() {
         zakoncz = false;
-        odswiezminiatury = false;
+        odswiezminiatury = 0;
+        odswiezylemminiatury = 0;
         zajety = false;
+    }
+
+    public static void przerwijMiniatury() {
+        AppService.service.watekminiatury.przerwij = true;
     }
 
     private int pobierzOrient(it.sephiroth.android.library.exif2.ExifInterface exiflib) {
@@ -108,14 +113,14 @@ public class WatekMiniatury extends Thread {
 
     public void run() {
         while(zakoncz == false) {
-            Rozne.czekaj(10);
-            if(odswiezminiatury == true) {
+            Rozne.czekaj(1);
+            if(odswiezminiatury > odswiezylemminiatury) {
                 zajety = true;
                 przerwij = false;
                 MainActivity.widocznoscPostepuOpcje(View.VISIBLE, Color.GREEN);
                 zaktualizujMiniatury();
                 MainActivity.widocznoscPostepuOpcje(View.INVISIBLE, Color.GREEN);
-                odswiezminiatury = false;
+                odswiezylemminiatury = odswiezminiatury;
                 zajety = false;
             }
         }

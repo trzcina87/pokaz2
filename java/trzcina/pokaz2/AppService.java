@@ -32,20 +32,14 @@ public class AppService extends Service {
     private void wystartujWatki() {
         if(wateklistujpliki == null) {
             wateklistujpliki = new WatekListujPliki();
-            wateklistujpliki.start();
-        }
-        if(watekminiatury == null) {
             watekminiatury = new WatekMiniatury();
-            watekminiatury.start();
-        }
-        if(watekwczytaj == null) {
             watekwczytaj = new WatekWczytaj();
-            watekwczytaj.start();
-            watekwczytaj.przeladuj = true;
-        }
-        if(watekrysuj == null) {
             watekrysuj = new WatekRysuj();
+            wateklistujpliki.start();
+            watekminiatury.start();
+            watekwczytaj.start();
             watekrysuj.start();
+            watekwczytaj.przeladuj = true;
             watekrysuj.odswiez = true;
         }
     }

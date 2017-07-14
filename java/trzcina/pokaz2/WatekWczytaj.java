@@ -12,6 +12,8 @@ public class WatekWczytaj extends Thread {
     public WatekWczytaj() {
         pliki = null;
         przeladuj = false;
+        iloscplikow = 0;
+        zakoncz = false;
     }
 
     private void wyczyscObecnePliki() {
@@ -72,15 +74,20 @@ public class WatekWczytaj extends Thread {
 
     public void run() {
         while(zakoncz == false) {
-            Rozne.czekaj(10);
+            Rozne.czekaj(1);
             if(przeladuj) {
                 wczytajPliki();
+                MainActivity.ktoryplik = 0;
+                AppService.service.watekrysuj.odswiez = true;
             }
             if(iloscplikow > 0) {
                 int ktoryplikwczytac = MainActivity.ktoryplik;
                 if((ktoryplikwczytac < iloscplikow) && (ktoryplikwczytac >= 0)) {
                     if (pliki[ktoryplikwczytac].bitmapa == null) {
-                        pliki[ktoryplikwczytac].zaladuj();
+                        boolean czyzaladowano = pliki[ktoryplikwczytac].zaladuj();
+                        if(czyzaladowano == false) {
+                            wyczyscObecnePliki();
+                        }
                     }
                 }
             }

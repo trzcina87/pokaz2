@@ -148,6 +148,15 @@ public class MainActivity extends AppCompatActivity {
         return super.dispatchKeyEvent(event);
     }
 
+    private void wyswietlPotwierdzenieZamkniecia() {
+        new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert).setTitle("Wyjscie z aplikacji?").setMessage("Czy na pewno chcesz zakonczyc?").setPositiveButton("Tak", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        }).setNegativeButton("Nie", null).show();
+    }
+
     @Override
     public void onBackPressed() {
         if (trybopcji) {
@@ -162,23 +171,20 @@ public class MainActivity extends AppCompatActivity {
                         wstecz = "/";
                     }
                     folderroboczy = wstecz;
+                    WatekMiniatury.przerwijMiniatury();
                     AppService.service.wateklistujpliki.odswiezfoldery = true;
                 }
             } else {
                 if (AppService.service.wateklistujpliki.zajety == true) {
                     MainActivity.wyswietlToast("Zaczekaj na wczytanie plikow!");
                 } else {
+                    WatekMiniatury.przerwijMiniatury();
                     Widoki.activitylayout.removeView(Widoki.opcjelayout);
                     trybopcji = false;
                 }
             }
         } else {
-            new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert).setTitle("Wyjscie z aplikacji?").setMessage("Czy na pewno chcesz zakonczyc?").setPositiveButton("Tak", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    finish();
-                }
-            }).setNegativeButton("Nie", null).show();
+            wyswietlPotwierdzenieZamkniecia();
         }
     }
 
@@ -234,6 +240,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 Toast.makeText(MainActivity.activity.getApplicationContext(), tresc, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public static void pokazKlepsydre() {
+        MainActivity.activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Widoki.imageviewklepsydra.setVisibility(View.VISIBLE);
+                Widoki.imageviewklepsydra.bringToFront();
+            }
+        });
+    }
+
+    public static void ukryjKlepsydre() {
+        MainActivity.activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Widoki.imageviewklepsydra.setVisibility(View.INVISIBLE);
             }
         });
     }

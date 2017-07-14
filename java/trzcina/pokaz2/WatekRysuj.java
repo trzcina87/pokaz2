@@ -9,15 +9,14 @@ import android.graphics.Rect;
 public class WatekRysuj extends Thread {
 
     public volatile boolean zakoncz;
-    public int ktorynarysowany;
     public volatile boolean odswiez;
     private Paint paintexifwhite;
     private Paint paintexifred;
     private Paint paintexifblack;
+    private Paint paintbrakplikow;
 
     public WatekRysuj() {
         zakoncz = false;
-        ktorynarysowany = -1;
         odswiez = false;
         inicjujPainty();
     }
@@ -35,6 +34,10 @@ public class WatekRysuj extends Thread {
         paintexifblack.setColor(Color.BLACK);
         paintexifblack.setTextSize(30);
         paintexifblack.setAntiAlias(true);
+        paintbrakplikow = new Paint();
+        paintbrakplikow.setColor(Color.WHITE);
+        paintbrakplikow.setTextSize(60);
+        paintbrakplikow.setAntiAlias(true);
     }
 
     private int obliczDlugoscProporcjonalnie(int dlugosc, int wysokosc, int docelowawysokosc) {
@@ -90,7 +93,10 @@ public class WatekRysuj extends Thread {
                 canvas.drawBitmap(bitmapa, caloscBitmapyRect(bitmapa), wysrodkujRect(bitmapa.getWidth(), bitmapa.getHeight()), null);
                 naniesInfo(canvas, ktoryplik);
                 MainActivity.surface.surfaceHolder.unlockCanvasAndPost(canvas);
-                ktorynarysowany = ktoryplik;
+                MainActivity.ukryjKlepsydre();
+            } else {
+                MainActivity.pokazKlepsydre();
+                odswiez = true;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -113,7 +119,10 @@ public class WatekRysuj extends Thread {
                 canvas.drawBitmap(bitmapa, caloscBitmapyRect(bitmapa), wysrodkujRect(docelowadlugosc, docelowawysokosc), null);
                 naniesInfo(canvas, ktoryplik);
                 MainActivity.surface.surfaceHolder.unlockCanvasAndPost(canvas);
-                ktorynarysowany = ktoryplik;
+                MainActivity.ukryjKlepsydre();
+            } else {
+                MainActivity.pokazKlepsydre();
+                odswiez = true;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -122,14 +131,28 @@ public class WatekRysuj extends Thread {
         }
     }
 
+    private void rysujBrakPlikow() {
+        Canvas canvas = null;
+        try {
+            canvas = MainActivity.surface.surfaceHolder.lockCanvas();
+            canvas.drawColor(Color.BLACK);
+            canvas.drawText("BRAK PLIKÓW", 0, MainActivity.rozdzielczosc.y - 2, paintbrakplikow);
+            MainActivity.surface.surfaceHolder.unlockCanvasAndPost(canvas);
+            MainActivity.ukryjKlepsydre();
+        } catch (Exception e) {
+            e.printStackTrace();
+            zwolnijCanvas(canvas);
+            odswiez = true;
+        }
+    }
+
     public void run() {
         while(zakoncz == false) {
             Rozne.czekaj(1);
             if(AppService.service.watekwczytaj.iloscplikow > 0) {
                 int ktoryplikrysowac = MainActivity.ktoryplik;
-                if((ktorynarysowany != ktoryplikrysowac) || (odswiez)) {
+                if(odswiez) {
                     odswiez = false;
-                    ktorynarysowany = -1;
                     if(MainActivity.powiekszenie == 0) {
                         rysujObrazPelnyEkran(ktoryplikrysowac);
                     }
@@ -137,6 +160,8 @@ public class WatekRysuj extends Thread {
                         rysujObraz100(ktoryplikrysowac);
                     }
                 }
+            } else {
+                rysujBrakPlikow();
             }
         }
     }
