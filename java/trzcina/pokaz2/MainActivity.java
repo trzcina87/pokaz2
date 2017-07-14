@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     public static int yprzesun;
     public static String zacznijodpliku;
     public static boolean jestemwfolderach;
-    public static String folderwstecz;
+    public static int ktoryplik;
     public static boolean trybopcji;
     public static String folderroboczy;
 
@@ -56,8 +56,8 @@ public class MainActivity extends AppCompatActivity {
         yprzesun = 0;
         zacznijodpliku = null;
         jestemwfolderach = false;
-        folderwstecz = null;
         trybopcji = false;
+        ktoryplik = 0;
     }
 
     private void ustawEkran() {
@@ -105,6 +105,44 @@ public class MainActivity extends AppCompatActivity {
                     trybopcji = true;
                     return true;
                 }
+            }
+            if (Arrays.asList(Kody.LEWO).contains(key)) {
+                if((MainActivity.powiekszenie == 0) && (trybopcji == false)){
+                    int iloscplikow = AppService.service.watekwczytaj.iloscplikow;
+                    if (iloscplikow > 0) {
+                        ktoryplik = ktoryplik - 1;
+                        if (ktoryplik < 0) {
+                            ktoryplik = iloscplikow - 1;
+                        }
+                    }
+                    AppService.service.watekrysuj.odswiez = true;
+                    return true;
+                }
+            }
+            if (Arrays.asList(Kody.PRAWO).contains(key)) {
+                if((MainActivity.powiekszenie == 0) && (trybopcji == false)){
+                    int iloscplikow = AppService.service.watekwczytaj.iloscplikow;
+                    if (iloscplikow > 0) {
+                        ktoryplik = ktoryplik + 1;
+                        if (ktoryplik >= iloscplikow) {
+                            ktoryplik = 0;
+                        }
+                    }
+                    AppService.service.watekrysuj.odswiez = true;
+                    return true;
+                }
+            }
+            if (Arrays.asList(Kody.STO).contains(key)) {
+                MainActivity.powiekszenie = 100;
+                AppService.service.watekrysuj.odswiez = true;
+            }
+            if (Arrays.asList(Kody.ORG).contains(key)) {
+                MainActivity.powiekszenie = 0;
+                AppService.service.watekrysuj.odswiez = true;
+            }
+            if (Arrays.asList(Kody.INFO).contains(key)) {
+                MainActivity.poziominfo = (MainActivity.poziominfo + 1) % 5;
+                AppService.service.watekrysuj.odswiez = true;
             }
         }
         return super.dispatchKeyEvent(event);

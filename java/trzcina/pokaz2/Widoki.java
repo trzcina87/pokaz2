@@ -71,6 +71,8 @@ public class Widoki {
         } else {
             MainActivity.trybopcji = false;
             OpcjeProgramu.zapiszOpcje();
+            AppService.service.watekwczytaj.przeladuj = true;
+            AppService.service.watekrysuj.odswiez = true;
             activitylayout.removeView(opcjelayout);
         }
     }

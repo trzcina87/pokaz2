@@ -113,6 +113,8 @@ public class WatekListujPliki extends Thread {
                 } else {
                     MainActivity.trybopcji = false;
                     OpcjeProgramu.zapiszOpcje();
+                    AppService.service.watekwczytaj.przeladuj = true;
+                    AppService.service.watekrysuj.odswiez = true;
                     Widoki.activitylayout.removeView(Widoki.opcjelayout);
                 }
             }
