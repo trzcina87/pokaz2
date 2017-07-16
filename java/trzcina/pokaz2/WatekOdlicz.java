@@ -3,7 +3,7 @@ package trzcina.pokaz2;
 public class WatekOdlicz extends Thread {
 
     public volatile boolean zakoncz;
-    private long ostatniczas;
+    public long ostatniczas;
 
     public WatekOdlicz() {
         zakoncz = false;
@@ -23,7 +23,7 @@ public class WatekOdlicz extends Thread {
                                 MainActivity.ktoryplik = 0;
                             }
                             MainActivity.activity.resetujPrzesuj();
-                            ostatniczas = System.currentTimeMillis();
+                            ostatniczas = 2 * System.currentTimeMillis();
                             AppService.service.watekrysuj.odswiez = true;
                         }
                     }

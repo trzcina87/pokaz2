@@ -185,6 +185,7 @@ public class WatekRysuj extends Thread {
                     if(MainActivity.powiekszenie == 100) {
                         rysujObraz100(ktoryplikrysowac);
                     }
+                    AppService.service.watekodlicz.ostatniczas = System.currentTimeMillis();
                 }
             } else {
                 rysujBrakPlikow();

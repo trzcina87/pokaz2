@@ -36,7 +36,7 @@ public class WatekListujPliki extends Thread {
         MainActivity.wyczyscScroolView(Widoki.layoutscrollviewminiatury);
     }
 
-    private static void sortujPliki(File[] plikiobecne) {
+    public static void sortujPliki(File[] plikiobecne) {
         Arrays.sort(plikiobecne, new Comparator<File>() {
             @Override
             public int compare(File file, File t1) {
