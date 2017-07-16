@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.media.ExifInterface;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -94,20 +95,26 @@ public class WatekMiniatury extends Thread {
     }
 
     private void zaktualizujMiniatury() {
-        int iloscrzedow = Widoki.layoutscrollviewminiatury.getChildCount();
-        for(int i = 0; i < iloscrzedow; i++) {
-            LinearLayout rzadminiatury = (LinearLayout) Widoki.layoutscrollviewminiatury.getChildAt(i);
-            int iloscminiatur = rzadminiatury.getChildCount();
-            for(int j = 0; j < iloscminiatur; j++) {
-                LinearLayout miniaturalayout = (LinearLayout) rzadminiatury.getChildAt(j);
-                ImageView miniatura = (ImageView) miniaturalayout.getChildAt(0);
-                if (((String) (miniatura.getTag())).endsWith(".jpg") == true) {
-                    if(przerwij == false) {
-                        ustawMiniature(miniatura);
-                        Rozne.czekaj(300);
+        try {
+            int iloscrzedow = Widoki.layoutscrollviewminiatury.getChildCount();
+            for (int i = 0; i < iloscrzedow; i++) {
+                LinearLayout rzadminiatury = (LinearLayout) Widoki.layoutscrollviewminiatury.getChildAt(i);
+                int iloscminiatur = rzadminiatury.getChildCount();
+                for (int j = 0; j < iloscminiatur; j++) {
+                    LinearLayout miniaturalayout = (LinearLayout) rzadminiatury.getChildAt(j);
+                    ImageView miniatura = (ImageView) miniaturalayout.getChildAt(0);
+                    if (((String) (miniatura.getTag())).toLowerCase().endsWith(".jpg") == true) {
+                        if (przerwij == false) {
+                            Log.e("WATEKMIN", "robie min " + miniatura.getTag());
+                            ustawMiniature(miniatura);
+                        } else {
+                            Log.e("WATEKMIN", "pomijam min - przerwij");
+                        }
                     }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -115,12 +122,14 @@ public class WatekMiniatury extends Thread {
         while(zakoncz == false) {
             Rozne.czekaj(1);
             if(odswiezminiatury > odswiezylemminiatury) {
+                Rozne.czekaj(100);
+                Log.e("WATEKMIN", "odswiezam miniatury");
+                odswiezylemminiatury = odswiezminiatury;
                 zajety = true;
                 przerwij = false;
                 MainActivity.widocznoscPostepuOpcje(View.VISIBLE, Color.GREEN);
                 zaktualizujMiniatury();
                 MainActivity.widocznoscPostepuOpcje(View.INVISIBLE, Color.GREEN);
-                odswiezylemminiatury = odswiezminiatury;
                 zajety = false;
             }
         }

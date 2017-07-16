@@ -111,6 +111,12 @@ public class AppService extends Service {
         }
     }
 
+    private void odmontujKatalog() {
+        if(wateklistujpliki.montowaniete != null) {
+            Proces.odmontuj(wateklistujpliki.montowaniete);
+        }
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -119,6 +125,7 @@ public class AppService extends Service {
         zakonczWatekWczytaj();
         zakonczWatekRysuj();
         zakonczWatekOdlicz();
+        odmontujKatalog();
         Toast.makeText(MainActivity.activity.getApplicationContext(), "Zakonczono Pokaz2!", Toast.LENGTH_SHORT).show();
     }
 

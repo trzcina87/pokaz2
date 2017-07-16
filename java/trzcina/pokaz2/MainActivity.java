@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Layout;
+import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
@@ -33,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
     public static int xprzesun;
     public static int yprzesun;
     public static String zacznijodpliku;
-    public static boolean jestemwfolderach;
     public static int ktoryplik;
     public static boolean trybopcji;
     public static String folderroboczy;
@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
         xprzesun = 0;
         yprzesun = 0;
         zacznijodpliku = null;
-        jestemwfolderach = false;
         trybopcji = false;
         ktoryplik = 0;
         ostatniapauza = 0;
@@ -314,10 +313,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (trybopcji) {
-            if(jestemwfolderach) {
-                if (AppService.service.wateklistujpliki.zajety == true) {
-                    MainActivity.wyswietlToast("Zaczekaj na wczytanie plikow!");
-                } else {
+            if (AppService.service.wateklistujpliki.zajety == true) {
+                MainActivity.wyswietlToast("Zaczekaj na wczytanie plikow!");
+            } else {
+                if(Widoki.layoutscrollviewminiatury.getFocusedChild() != null) {
                     String wstecz;
                     if (new File(MainActivity.folderroboczy).getParentFile() != null) {
                         wstecz = new File(MainActivity.folderroboczy).getParentFile().getAbsolutePath() + "/";
@@ -326,11 +325,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     folderroboczy = wstecz;
                     WatekMiniatury.przerwijMiniatury();
+                    AppService.service.wateklistujpliki.focusnawstecz = true;
                     AppService.service.wateklistujpliki.odswiezfoldery = true;
-                }
-            } else {
-                if (AppService.service.wateklistujpliki.zajety == true) {
-                    MainActivity.wyswietlToast("Zaczekaj na wczytanie plikow!");
                 } else {
                     WatekMiniatury.przerwijMiniatury();
                     Widoki.activitylayout.removeView(Widoki.opcjelayout);

@@ -1,5 +1,7 @@
 package trzcina.pokaz2;
 
+import java.io.File;
+
 public class Proces {
 
     public static int ping(String address) {
@@ -26,6 +28,21 @@ public class Proces {
         String milisek = String.valueOf(milisekundy);
         try {
             Process process = new ProcessBuilder().redirectErrorStream(true).command("/system/bin/sh", "/sdcard/montujpokaz2.sh", milisek).start();
+            int wynik = process.waitFor();
+            if(wynik == 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static boolean odmontuj(String sciezka) {
+        try {
+            String milisekundy = new File(sciezka).getName();
+            Process process = new ProcessBuilder().redirectErrorStream(true).command("/system/bin/sh", "/sdcard/odmontujpokaz2.sh", milisekundy).start();
             int wynik = process.waitFor();
             if(wynik == 0) {
                 return true;
