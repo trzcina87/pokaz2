@@ -3,8 +3,10 @@ package trzcina.pokaz2;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.Log;
 
 public class WatekRysuj extends Thread {
 
@@ -43,10 +45,6 @@ public class WatekRysuj extends Thread {
     private int obliczDlugoscProporcjonalnie(int dlugosc, int wysokosc, int docelowawysokosc) {
         double ratio = (double)dlugosc / (double)wysokosc;
         return (int) (ratio * (float)docelowawysokosc);
-    }
-
-    private Rect caloscBitmapyRect(Bitmap bitmapa) {
-        return new Rect(0, 0, bitmapa.getWidth(), bitmapa.getHeight());
     }
 
     private boolean czyPionowyObraz(int dlugosc, int wysokosc) {
@@ -102,47 +100,71 @@ public class WatekRysuj extends Thread {
         }
     }
 
-    private void rysujObraz100(int ktoryplik) {
-        Canvas canvas = null;
-        try {
-            Bitmap bitmapa = AppService.service.watekwczytaj.pliki[ktoryplik].bitmapa;
-            if(bitmapa != null) {
-                canvas = MainActivity.surface.surfaceHolder.lockCanvas();
-                canvas.drawColor(Color.BLACK);
-                canvas.drawBitmap(bitmapa, caloscBitmapyRect(bitmapa), wysrodkujRect(bitmapa.getWidth(), bitmapa.getHeight()), null);
-                naniesInfo(canvas, ktoryplik);
-                MainActivity.surface.surfaceHolder.unlockCanvasAndPost(canvas);
-                MainActivity.ukryjKlepsydre();
-            } else {
-                MainActivity.pokazKlepsydre();
-                odswiez = true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            odswiez = true;
-            zwolnijCanvas(canvas);
+    public static boolean czyOdwrocic(int kat) {
+        if((kat == 90) || (kat == 270)) {
+            return true;
         }
+        return false;
     }
 
-    private void rysujObrazPelnyEkran(int ktoryplik) {
+    private Matrix stworzMacierz(int kat, int dlugosc, int wysokosc) {
+        Matrix matrix = new Matrix();
+        if(kat != 0) {
+            matrix.postRotate(kat);
+        }
+        if(kat == 270) {
+            matrix.postTranslate(0, wysokosc);
+        }
+        if(kat == 90) {
+            matrix.postTranslate(dlugosc, 0);
+        }
+        int lewo = 0;
+        int gora = 0;
+        if(czyPionowyObraz(dlugosc, wysokosc)) {
+            if(MainActivity.powiekszenie == 0) {
+                matrix.postScale(MainActivity.rozdzielczosc.y / (float) wysokosc, MainActivity.rozdzielczosc.y / (float) wysokosc);
+                int docelowadlugosc = obliczDlugoscProporcjonalnie(dlugosc, wysokosc, MainActivity.rozdzielczosc.y);
+                lewo = (MainActivity.rozdzielczosc.x - docelowadlugosc) / 2;
+            }
+            if(MainActivity.powiekszenie == 100) {
+                lewo = (MainActivity.rozdzielczosc.x - dlugosc) / 2;
+                gora = (MainActivity.rozdzielczosc.y - wysokosc) / 2;
+                lewo = lewo - MainActivity.xprzesun * 300;
+                gora = gora - MainActivity.yprzesun * 300;
+            }
+        } else {
+            if(MainActivity.powiekszenie == 0) {
+                matrix.postScale(MainActivity.rozdzielczosc.x / (float) dlugosc, MainActivity.rozdzielczosc.x / (float) dlugosc);
+                int docelowawysokosc = obliczDlugoscProporcjonalnie(wysokosc, dlugosc, MainActivity.rozdzielczosc.x);
+                gora = (MainActivity.rozdzielczosc.y - docelowawysokosc) / 2;
+            }
+            if(MainActivity.powiekszenie == 100) {
+                lewo = (MainActivity.rozdzielczosc.x - dlugosc) / 2;
+                gora = (MainActivity.rozdzielczosc.y - wysokosc) / 2;
+                lewo = lewo - MainActivity.xprzesun * 300;
+                gora = gora - MainActivity.yprzesun * 300;
+            }
+        }
+        matrix.postTranslate(lewo, gora);
+        return matrix;
+    }
+
+    private void rysujObraz(int ktoryplik) {
         Canvas canvas = null;
         try {
             Bitmap bitmapa = AppService.service.watekwczytaj.pliki[ktoryplik].bitmapa;
+            int kat = AppService.service.watekwczytaj.pliki[ktoryplik].orient;
             if(bitmapa != null) {
                 int dlugosc = bitmapa.getWidth();
                 int wysokosc = bitmapa.getHeight();
-                int docelowadlugosc = 0;
-                int docelowawysokosc = 0;
-                if(czyPionowyObraz(dlugosc, wysokosc)) {
-                    docelowawysokosc = MainActivity.rozdzielczosc.y;
-                    docelowadlugosc = obliczDlugoscProporcjonalnie(dlugosc, wysokosc, docelowawysokosc);
-                } else {
-                    docelowadlugosc = MainActivity.rozdzielczosc.x;
-                    docelowawysokosc = obliczDlugoscProporcjonalnie(wysokosc, dlugosc, docelowadlugosc);
+                if(czyOdwrocic(kat)) {
+                    dlugosc = bitmapa.getHeight();
+                    wysokosc = bitmapa.getWidth();
                 }
+                Matrix macierz = stworzMacierz(kat, dlugosc, wysokosc);
                 canvas = MainActivity.surface.surfaceHolder.lockCanvas();
                 canvas.drawColor(Color.BLACK);
-                canvas.drawBitmap(bitmapa, caloscBitmapyRect(bitmapa), wysrodkujRect(docelowadlugosc, docelowawysokosc), null);
+                canvas.drawBitmap(bitmapa, macierz, null);
                 naniesInfo(canvas, ktoryplik);
                 MainActivity.surface.surfaceHolder.unlockCanvasAndPost(canvas);
                 MainActivity.ukryjKlepsydre();
@@ -180,10 +202,10 @@ public class WatekRysuj extends Thread {
                 if(odswiez) {
                     odswiez = false;
                     if(MainActivity.powiekszenie == 0) {
-                        rysujObrazPelnyEkran(ktoryplikrysowac);
+                        rysujObraz(ktoryplikrysowac);
                     }
                     if(MainActivity.powiekszenie == 100) {
-                        rysujObraz100(ktoryplikrysowac);
+                        rysujObraz(ktoryplikrysowac);
                     }
                     AppService.service.watekodlicz.ostatniczas = System.currentTimeMillis();
                 }

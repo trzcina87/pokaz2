@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Random;
 
 public class WatekWczytaj extends Thread {
 
@@ -50,11 +51,33 @@ public class WatekWczytaj extends Thread {
         return ilosc;
     }
 
+    private void zamienWTab(File[] tab, int n1, int n2) {
+        File tmp = tab[n1];
+        tab[n1] = tab[n2];
+        tab[n2] = tmp;
+    }
+
+    private void przelosujTablice(File[] plikiwkatalogu) {
+        Random rn = new Random();
+        if(plikiwkatalogu != null) {
+            if(plikiwkatalogu.length > 0) {
+                for (int i = 0; i < plikiwkatalogu.length * 100; i++) {
+                    int n1 = rn.nextInt(plikiwkatalogu.length);
+                    int n2 = rn.nextInt(plikiwkatalogu.length);
+                    zamienWTab(plikiwkatalogu, n1, n2);
+                }
+            }
+        }
+    }
+
     private void wczytajNowaListe() {
         File katalog = new File(MainActivity.folderroboczy);
         File[] plikiwkatalogu = katalog.listFiles();
         if(plikiwkatalogu != null) {
             WatekListujPliki.sortujPliki(plikiwkatalogu);
+        }
+        if(OpcjeProgramu.losuj == 1) {
+            przelosujTablice(plikiwkatalogu);
         }
         iloscplikow = policzPlikiJPG(plikiwkatalogu);
         pliki = new PlikJPG[iloscplikow];

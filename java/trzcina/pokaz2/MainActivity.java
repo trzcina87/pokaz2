@@ -126,9 +126,14 @@ public class MainActivity extends AppCompatActivity {
                         resetujPrzesuj();
                     }
                 } else {
-                    xprzesun = xprzesun - 1;
-                    if(xprzesun < -20) {
-                        xprzesun = -20;
+                    try {
+                        int granica = AppService.service.watekwczytaj.pliki[ktoryplik].ilosckrokowx;
+                        xprzesun = xprzesun - 1;
+                        if (xprzesun < -granica) {
+                            xprzesun = -granica;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
                 AppService.service.watekrysuj.odswiez = true;
@@ -151,9 +156,14 @@ public class MainActivity extends AppCompatActivity {
                         resetujPrzesuj();
                     }
                 } else {
-                    xprzesun = xprzesun + 1;
-                    if(xprzesun > 20) {
-                        xprzesun = 20;
+                    try {
+                        int granica = AppService.service.watekwczytaj.pliki[ktoryplik].ilosckrokowx;
+                        xprzesun = xprzesun + 1;
+                        if (xprzesun > granica) {
+                            xprzesun = granica;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
                 AppService.service.watekrysuj.odswiez = true;
@@ -167,9 +177,14 @@ public class MainActivity extends AppCompatActivity {
         if (Arrays.asList(Kody.GORA).contains(key)) {
             if(trybopcji == false) {
                 if(MainActivity.powiekszenie != 0) {
-                    yprzesun = yprzesun - 1;
-                    if(yprzesun < -20) {
-                        yprzesun = -20;
+                    try {
+                        int granica = AppService.service.watekwczytaj.pliki[ktoryplik].ilosckrokowy;
+                        yprzesun = yprzesun - 1;
+                        if (yprzesun < -granica) {
+                            yprzesun = -granica;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
                 AppService.service.watekrysuj.odswiez = true;
@@ -183,9 +198,14 @@ public class MainActivity extends AppCompatActivity {
         if (Arrays.asList(Kody.DOL).contains(key)) {
             if(trybopcji == false) {
                 if(MainActivity.powiekszenie != 0) {
-                    yprzesun = yprzesun + 1;
-                    if(yprzesun > 20) {
-                        yprzesun = 20;
+                    try {
+                        int granica = AppService.service.watekwczytaj.pliki[ktoryplik].ilosckrokowy;
+                        yprzesun = yprzesun + 1;
+                        if (yprzesun > granica) {
+                            yprzesun = granica;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
                 AppService.service.watekrysuj.odswiez = true;
