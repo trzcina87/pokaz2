@@ -107,6 +107,33 @@ public class WatekRysuj extends Thread {
         return false;
     }
 
+    private int poprawLewo(int lewo, int wymiar) {
+        if(wymiar < MainActivity.rozdzielczosc.x) {
+            return (MainActivity.rozdzielczosc.x - wymiar) / 2;
+        }
+        if(lewo > 0) {
+            lewo = 0;
+        }
+        if(lewo - MainActivity.rozdzielczosc.x < -wymiar) {
+            lewo = -wymiar + MainActivity.rozdzielczosc.x;
+        }
+        return lewo;
+    }
+
+    private int poprawGora(int gora, int wymiar) {
+        if(wymiar < MainActivity.rozdzielczosc.y) {
+            return (MainActivity.rozdzielczosc.y - wymiar) / 2;
+        }
+        if(gora > 0) {
+            gora = 0;
+        }
+        if(gora - MainActivity.rozdzielczosc.y < -wymiar) {
+            gora = -wymiar + MainActivity.rozdzielczosc.y;
+        }
+        return gora;
+    }
+
+
     private Matrix stworzMacierz(int kat, int dlugosc, int wysokosc) {
         Matrix matrix = new Matrix();
         if(kat != 0) {
@@ -120,6 +147,7 @@ public class WatekRysuj extends Thread {
         }
         int lewo = 0;
         int gora = 0;
+        float powiekszenie = MainActivity.powiekszenie / (float)100;
         if(czyPionowyObraz(dlugosc, wysokosc)) {
             if(MainActivity.powiekszenie == 0) {
                 matrix.postScale(MainActivity.rozdzielczosc.y / (float) wysokosc, MainActivity.rozdzielczosc.y / (float) wysokosc);
@@ -131,6 +159,17 @@ public class WatekRysuj extends Thread {
                 gora = (MainActivity.rozdzielczosc.y - wysokosc) / 2;
                 lewo = lewo - MainActivity.xprzesun * 300;
                 gora = gora - MainActivity.yprzesun * 300;
+                lewo = poprawLewo(lewo, (int) (powiekszenie * dlugosc));
+                gora = poprawGora(gora, (int) (powiekszenie * wysokosc));
+            }
+            if((MainActivity.powiekszenie != 100) && (MainActivity.powiekszenie != 0)) {
+                matrix.postScale(powiekszenie, powiekszenie);
+                lewo = (int) ((MainActivity.rozdzielczosc.x - dlugosc * powiekszenie) / 2);
+                gora = (int) ((MainActivity.rozdzielczosc.y - wysokosc * powiekszenie) / 2);
+                lewo = (int) (lewo - MainActivity.xprzesun * 300 * powiekszenie);
+                gora = (int) (gora - MainActivity.yprzesun * 300 * powiekszenie);
+                lewo = poprawLewo(lewo, (int) (powiekszenie * dlugosc));
+                gora = poprawGora(gora, (int) (powiekszenie * wysokosc));
             }
         } else {
             if(MainActivity.powiekszenie == 0) {
@@ -143,6 +182,17 @@ public class WatekRysuj extends Thread {
                 gora = (MainActivity.rozdzielczosc.y - wysokosc) / 2;
                 lewo = lewo - MainActivity.xprzesun * 300;
                 gora = gora - MainActivity.yprzesun * 300;
+                lewo = poprawLewo(lewo, (int) (powiekszenie * dlugosc));
+                gora = poprawGora(gora, (int) (powiekszenie * wysokosc));
+            }
+            if((MainActivity.powiekszenie != 100) && (MainActivity.powiekszenie != 0)) {
+                matrix.postScale(powiekszenie, powiekszenie);
+                lewo = (int) ((MainActivity.rozdzielczosc.x - dlugosc * powiekszenie) / 2);
+                gora = (int) ((MainActivity.rozdzielczosc.y - wysokosc * powiekszenie) / 2);
+                lewo = (int) (lewo - MainActivity.xprzesun * 300 * powiekszenie);
+                gora = (int) (gora - MainActivity.yprzesun * 300 * powiekszenie);
+                lewo = poprawLewo(lewo, (int) (powiekszenie * dlugosc));
+                gora = poprawGora(gora, (int) (powiekszenie * wysokosc));
             }
         }
         matrix.postTranslate(lewo, gora);
@@ -201,12 +251,7 @@ public class WatekRysuj extends Thread {
                 int ktoryplikrysowac = MainActivity.ktoryplik;
                 if(odswiez) {
                     odswiez = false;
-                    if(MainActivity.powiekszenie == 0) {
-                        rysujObraz(ktoryplikrysowac);
-                    }
-                    if(MainActivity.powiekszenie == 100) {
-                        rysujObraz(ktoryplikrysowac);
-                    }
+                    rysujObraz(ktoryplikrysowac);
                     AppService.service.watekodlicz.ostatniczas = System.currentTimeMillis();
                 }
             } else {

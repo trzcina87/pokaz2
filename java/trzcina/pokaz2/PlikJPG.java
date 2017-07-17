@@ -16,6 +16,8 @@ public class PlikJPG {
     public String sciezka;
     public Integer ilosckrokowx;
     public Integer ilosckrokowy;
+    public Integer krokx;
+    public Integer kroky;
 
     public PlikJPG() {
         sciezka = null;
@@ -24,6 +26,9 @@ public class PlikJPG {
         exif = null;
         ilosckrokowx = null;
         ilosckrokowy = null;
+        krokx = null;
+        kroky = null;
+
     }
 
     public void wyczysc() {
@@ -80,20 +85,29 @@ public class PlikJPG {
         }
     }
 
-    private int zeroJesliUjemna(int liczba) {
-        if(liczba < 0) {
-            return 0;
-        }
-        return liczba;
-    }
-
     private void uzupelnijKroki() {
         if(WatekRysuj.czyOdwrocic(orient)) {
-            ilosckrokowx = (zeroJesliUjemna(bitmapa.getHeight() - MainActivity.rozdzielczosc.x)) / 2 / 300 + 1;
-            ilosckrokowy = (zeroJesliUjemna(bitmapa.getWidth() - MainActivity.rozdzielczosc.y)) / 2 / 300 + 1;
+            if(bitmapa.getWidth() % 300 == 0) {
+                ilosckrokowy = bitmapa.getWidth() / 2 / 300;
+            } else {
+                ilosckrokowy = bitmapa.getWidth() / 2 / 300 + 1;
+            }
+            if(bitmapa.getHeight() % 300 == 0) {
+                ilosckrokowx = bitmapa.getHeight() / 2 / 300;
+            } else {
+                ilosckrokowx = bitmapa.getHeight() / 2 / 300 + 1;
+            }
         } else {
-            ilosckrokowx = (zeroJesliUjemna(bitmapa.getWidth() - MainActivity.rozdzielczosc.x)) / 2 / 300 + 1;
-            ilosckrokowy = (zeroJesliUjemna(bitmapa.getHeight() - MainActivity.rozdzielczosc.y)) / 2 / 300 + 1;
+            if(bitmapa.getWidth() % 300 == 0) {
+                ilosckrokowx = bitmapa.getWidth() / 2 / 300;
+            } else {
+                ilosckrokowx = bitmapa.getWidth() / 2 / 300 + 1;
+            }
+            if(bitmapa.getHeight() % 300 == 0) {
+                ilosckrokowy = bitmapa.getHeight() / 2 / 300;
+            } else {
+                ilosckrokowy = bitmapa.getHeight() / 2 / 300 + 1;
+            }
         }
     }
 

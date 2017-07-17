@@ -260,6 +260,33 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    private boolean obsluzPowieksz(int key) {
+        if(trybopcji == false) {
+            if (Arrays.asList(Kody.POWIEKSZ).contains(key)) {
+                if(MainActivity.powiekszenie != 0) {
+                    MainActivity.powiekszenie = MainActivity.powiekszenie + 10;
+                    AppService.service.watekrysuj.odswiez = true;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    private boolean obsluzPomniejsz(int key) {
+        if(trybopcji == false) {
+            if (Arrays.asList(Kody.POMNIEJSZ).contains(key)) {
+                if((MainActivity.powiekszenie != 0) && (MainActivity.powiekszenie != 10)) {
+                    MainActivity.powiekszenie = MainActivity.powiekszenie - 10;
+                    AppService.service.watekrysuj.odswiez = true;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void ustawPlayPauza() {
         final long lokalnaostatniapauza = System.currentTimeMillis();
         ostatniapauza = lokalnaostatniapauza;
@@ -315,6 +342,12 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
             if(obsluzSpacja(key)) {
+                return true;
+            }
+            if(obsluzPowieksz(key)) {
+                return true;
+            }
+            if(obsluzPomniejsz(key)) {
                 return true;
             }
         }
