@@ -105,10 +105,7 @@ public class WatekMiniatury extends Thread {
                     ImageView miniatura = (ImageView) miniaturalayout.getChildAt(0);
                     if (((String) (miniatura.getTag())).toLowerCase().endsWith(".jpg") == true) {
                         if (przerwij == false) {
-                            Log.e("WATEKMIN", "robie min " + miniatura.getTag());
                             ustawMiniature(miniatura);
-                        } else {
-                            Log.e("WATEKMIN", "pomijam min - przerwij");
                         }
                     }
                 }
@@ -120,10 +117,9 @@ public class WatekMiniatury extends Thread {
 
     public void run() {
         while(zakoncz == false) {
-            Rozne.czekaj(1);
+            Rozne.czekaj(50);
             if(odswiezminiatury > odswiezylemminiatury) {
                 Rozne.czekaj(100);
-                Log.e("WATEKMIN", "odswiezam miniatury");
                 odswiezylemminiatury = odswiezminiatury;
                 zajety = true;
                 przerwij = false;

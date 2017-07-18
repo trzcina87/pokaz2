@@ -18,10 +18,12 @@ public class PlikJPG {
     public Integer ilosckrokowy;
     public Integer krokx;
     public Integer kroky;
+    public Bitmap bitmapaslajd;
 
     public PlikJPG() {
         sciezka = null;
         bitmapa = null;
+        bitmapaslajd = null;
         orient = 0;
         exif = null;
         ilosckrokowx = null;
@@ -35,6 +37,10 @@ public class PlikJPG {
         if(bitmapa != null) {
             bitmapa.recycle();
             bitmapa = null;
+        }
+        if(bitmapaslajd != null) {
+            bitmapaslajd.recycle();
+            bitmapaslajd = null;
         }
     }
 
@@ -115,12 +121,10 @@ public class PlikJPG {
 
     public boolean zaladuj() {
         try {
-            Log.e("PLIKJPG", "Probuje ladowac: " + sciezka);
             uzupelnijOrient();
             bitmapa = BitmapFactory.decodeFile(sciezka);
             uzupelnijExif();
             uzupelnijKroki();
-            Log.e("PLIKJPG", "Zaladowalem: " + sciezka);
             return true;
         } catch (OutOfMemoryError error) {
             return false;

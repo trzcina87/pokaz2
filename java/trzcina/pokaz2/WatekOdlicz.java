@@ -16,7 +16,7 @@ public class WatekOdlicz extends Thread {
 
     public void run() {
         while(zakoncz == false) {
-            Rozne.czekaj(1);
+            Rozne.czekaj(50);
             if(OpcjeProgramu.pokazslidow == 1) {
                 if(System.currentTimeMillis() > ostatniczas + OpcjeProgramu.czaszdjecia * 1000) {
                     if (MainActivity.powiekszenie == 0) {

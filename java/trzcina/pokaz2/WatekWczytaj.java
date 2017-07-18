@@ -70,6 +70,9 @@ public class WatekWczytaj extends Thread {
                 }
             }
         }
+    }
+
+    private void znajdzKlikniety(File[] plikiwkatalogu) {
         if(zacznijod != null) {
             for(int i = 0; i < plikiwkatalogu.length; i++) {
                 if(plikiwkatalogu[i].getAbsolutePath().equals(zacznijod)) {
@@ -89,6 +92,7 @@ public class WatekWczytaj extends Thread {
         if(OpcjeProgramu.losuj == 1) {
             przelosujTablice(plikiwkatalogu);
         }
+        znajdzKlikniety(plikiwkatalogu);
         iloscplikow = policzPlikiJPG(plikiwkatalogu);
         pliki = new PlikJPG[iloscplikow];
         int aktualnyplik = 0;
@@ -136,7 +140,7 @@ public class WatekWczytaj extends Thread {
 
     public void run() {
         while(zakoncz == false) {
-            Rozne.czekaj(1);
+            Rozne.czekaj(10);
             if(przeladuj) {
                 wczytajPliki();
                 MainActivity.ktoryplik = 0;
@@ -155,41 +159,32 @@ public class WatekWczytaj extends Thread {
                         if(czyIntWTablicy(i, potrzebne) == false) {
                             if(pliki[i].bitmapa != null) {
                                 pliki[i].wyczysc();
-                                Log.e("WCZYTAJ", "Czyszcze: " + i);
                             }
                         }
                     }
                     if (pliki[ktoryplikwczytac].bitmapa == null) {
                         boolean czyzaladowano = pliki[ktoryplikwczytac].zaladuj();
-                        Log.e("WCZYTAJ", "Wczytuje: " + ktoryplikwczytac);
                         if(czyzaladowano == false) {
                             wyczyscObecnePliki();
-                            Log.e("WCZYTAJ", "Czyszcze wszystko!");
                         }
                     }
                     if (pliki[ktoryplikwczytac].bitmapa == null) {
                         pliki[ktoryplikwczytac].zaladuj();
-                        Log.e("WCZYTAJ", "Wczytuje: " + ktoryplikwczytac);
                     }
                     if (pliki[nastepny1].bitmapa == null) {
                         pliki[nastepny1].zaladuj();
-                        Log.e("WCZYTAJ", "Wczytuje: " + nastepny1);
                     }
                     if (pliki[nastepny2].bitmapa == null) {
                         pliki[nastepny2].zaladuj();
-                        Log.e("WCZYTAJ", "Wczytuje: " + nastepny2);
                     }
                     if (pliki[poprzedni1].bitmapa == null) {
                         pliki[poprzedni1].zaladuj();
-                        Log.e("WCZYTAJ", "Wczytuje: " + poprzedni1);
                     }
                     if (pliki[nastepny3].bitmapa == null) {
                         pliki[nastepny3].zaladuj();
-                        Log.e("WCZYTAJ", "Wczytuje: " + nastepny3);
                     }
                     if (pliki[poprzedni2].bitmapa == null) {
                         pliki[poprzedni2].zaladuj();
-                        Log.e("WCZYTAJ", "Wczytuje: " + poprzedni2);
                     }
                 }
             }

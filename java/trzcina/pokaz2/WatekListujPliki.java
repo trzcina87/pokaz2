@@ -213,7 +213,7 @@ public class WatekListujPliki extends Thread {
 
     public void run() {
         while(zakoncz == false) {
-            Rozne.czekaj(1);
+            Rozne.czekaj(50);
             if(odswiezfoldery == true) {
                 zajety = true;
                 MainActivity.widocznoscPostepuOpcje(View.VISIBLE, Color.RED);

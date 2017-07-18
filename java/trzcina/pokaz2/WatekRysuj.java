@@ -169,13 +169,6 @@ public class WatekRysuj extends Thread {
             } else {
                 powiekszenie = MainActivity.rozdzielczosc.x / (float) dlugosc;
             }
-            if((OpcjeProgramu.pokazslidow == 1) && (MainActivity.animacja)) {
-                if(czyPionowyObraz(dlugosc, wysokosc)) {
-                    powiekszenie = (MainActivity.rozdzielczosc.y + 200) / (float) wysokosc;
-                } else {
-                    powiekszenie = (MainActivity.rozdzielczosc.x + 200) /(float) dlugosc;
-                }
-            }
         }
         if(MainActivity.powiekszenie == 100) {
             lewo = (MainActivity.rozdzielczosc.x - dlugosc) / 2;
@@ -269,10 +262,23 @@ public class WatekRysuj extends Thread {
         rysujWidocznyObszar(canvas, dlugosc, wysokosc, powiekszenie, matrix);
     }
 
+    private void uzupelnijBitmapeSlajd(int ktoryplik, int dlugosc, int wysokosc, Bitmap bitmap) {
+        float powiekszenie;
+        if(czyPionowyObraz(dlugosc, wysokosc)) {
+            powiekszenie = (MainActivity.rozdzielczosc.y + 200) / (float) wysokosc;
+        } else {
+            powiekszenie = (MainActivity.rozdzielczosc.x + 200) /(float) dlugosc;
+        }
+        Macierz matrix = new Macierz();
+        matrix.postScale(powiekszenie, powiekszenie);
+        AppService.service.watekwczytaj.pliki[ktoryplik].bitmapaslajd = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+    }
+
     private void rysujObraz(int ktoryplik) {
         Canvas canvas = null;
         try {
             Bitmap bitmapa = AppService.service.watekwczytaj.pliki[ktoryplik].bitmapa;
+            Bitmap bitmapaslajd = AppService.service.watekwczytaj.pliki[ktoryplik].bitmapaslajd;
             int kat = AppService.service.watekwczytaj.pliki[ktoryplik].orient;
             if(bitmapa != null) {
                 int dlugosc = bitmapa.getWidth();
@@ -281,16 +287,33 @@ public class WatekRysuj extends Thread {
                     dlugosc = bitmapa.getHeight();
                     wysokosc = bitmapa.getWidth();
                 }
-                Macierz macierz = stworzMacierz(kat, dlugosc, wysokosc);
-                canvas = MainActivity.surface.surfaceHolder.lockCanvas();
-                canvas.drawColor(Color.BLACK);
-                if(MainActivity.powiekszenie == 100) {
-                    canvas.drawBitmap(bitmapa, macierz, null);
+                if((MainActivity.animacja == true) && (MainActivity.powiekszenie == 0) && (OpcjeProgramu.pokazslidow == 1)) {
+                    if(bitmapaslajd == null) {
+                        uzupelnijBitmapeSlajd(ktoryplik, dlugosc, wysokosc, bitmapa);
+                        bitmapaslajd = AppService.service.watekwczytaj.pliki[ktoryplik].bitmapaslajd;
+                        dlugosc = bitmapaslajd.getWidth();
+                        wysokosc = bitmapaslajd.getHeight();
+                        if(czyOdwrocic(kat)) {
+                            dlugosc = bitmapaslajd.getHeight();
+                            wysokosc = bitmapaslajd.getWidth();
+                        }
+                        Macierz macierz = stworzMacierz(kat, dlugosc, wysokosc);
+                        canvas = MainActivity.surface.surfaceHolder.lockCanvas();
+                        canvas.drawColor(Color.BLACK);
+                        canvas.drawBitmap(bitmapaslajd, macierz, paintfilter);
+                    }
                 } else {
-                    canvas.drawBitmap(bitmapa, macierz, paintfilter);
-                }
-                if(MainActivity.powiekszenie != 0) {
-                    rysujPodglad(canvas, bitmapa, macierz, dlugosc, wysokosc, kat);
+                    Macierz macierz = stworzMacierz(kat, dlugosc, wysokosc);
+                    canvas = MainActivity.surface.surfaceHolder.lockCanvas();
+                    canvas.drawColor(Color.BLACK);
+                    if (MainActivity.powiekszenie == 100) {
+                        canvas.drawBitmap(bitmapa, macierz, null);
+                    } else {
+                        canvas.drawBitmap(bitmapa, macierz, paintfilter);
+                    }
+                    if (MainActivity.powiekszenie != 0) {
+                        rysujPodglad(canvas, bitmapa, macierz, dlugosc, wysokosc, kat);
+                    }
                 }
                 naniesInfo(canvas, ktoryplik);
                 MainActivity.surface.surfaceHolder.unlockCanvasAndPost(canvas);
