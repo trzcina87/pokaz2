@@ -109,6 +109,8 @@ public class PlikJPG {
                 ilosckrokowy = bitmapa.getHeight() / 2 / 300 + 1;
             }
         }
+        ilosckrokowx = 10;
+        ilosckrokowy = 10;
     }
 
     public boolean zaladuj() {

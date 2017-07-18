@@ -3,7 +3,6 @@ package trzcina.pokaz2;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
@@ -16,6 +15,9 @@ public class WatekRysuj extends Thread {
     private Paint paintexifred;
     private Paint paintexifblack;
     private Paint paintbrakplikow;
+    private Paint paintobwodmin;
+    private Paint paintwidocznyobszar;
+    private Paint paintfilter;
 
     public WatekRysuj() {
         zakoncz = false;
@@ -40,14 +42,22 @@ public class WatekRysuj extends Thread {
         paintbrakplikow.setColor(Color.WHITE);
         paintbrakplikow.setTextSize(60);
         paintbrakplikow.setAntiAlias(true);
+        paintobwodmin = new Paint();
+        paintobwodmin.setColor(Color.WHITE);
+        paintobwodmin.setStrokeWidth(5);
+        paintwidocznyobszar = new Paint();
+        paintwidocznyobszar.setColor(Color.RED);
+        paintwidocznyobszar.setStrokeWidth(5);
+        paintwidocznyobszar.setStyle(Paint.Style.STROKE);
+        paintfilter = new Paint(Paint.FILTER_BITMAP_FLAG);
     }
 
-    private int obliczDlugoscProporcjonalnie(int dlugosc, int wysokosc, int docelowawysokosc) {
+    /*private int obliczDlugoscProporcjonalnie(int dlugosc, int wysokosc, int docelowawysokosc) {
         double ratio = (double)dlugosc / (double)wysokosc;
         return (int) (ratio * (float)docelowawysokosc);
-    }
+    }*/
 
-    private boolean czyPionowyObraz(int dlugosc, int wysokosc) {
+    public static boolean czyPionowyObraz(int dlugosc, int wysokosc) {
         double ratio = (double)dlugosc / (double)wysokosc;
         if(ratio < MainActivity.ratio) {
             return true;
@@ -56,7 +66,7 @@ public class WatekRysuj extends Thread {
         }
     }
 
-    private Rect wysrodkujRect(int dlugosc, int wysokosc) {
+    /*private Rect wysrodkujRect(int dlugosc, int wysokosc) {
         Rect rect = new Rect();
         int roznicawpoziomie = dlugosc - MainActivity.rozdzielczosc.x;
         int roznicawpionie = wysokosc - MainActivity.rozdzielczosc.y;
@@ -73,7 +83,7 @@ public class WatekRysuj extends Thread {
         rect.right = rect.left + dlugosc;
         rect.bottom = rect.top + wysokosc;
         return rect;
-    }
+    }*/
 
     private void naniesInfo(Canvas canvas, int ktoryplik) {
         String exif = AppService.service.watekwczytaj.pliki[ktoryplik].exif;
@@ -133,9 +143,7 @@ public class WatekRysuj extends Thread {
         return gora;
     }
 
-
-    private Matrix stworzMacierz(int kat, int dlugosc, int wysokosc) {
-        Matrix matrix = new Matrix();
+    private void obrocMacierz(Macierz matrix, int kat, int dlugosc, int wysokosc) {
         if(kat != 0) {
             matrix.postRotate(kat);
         }
@@ -145,58 +153,108 @@ public class WatekRysuj extends Thread {
         if(kat == 90) {
             matrix.postTranslate(dlugosc, 0);
         }
+    }
+
+    private Macierz stworzMacierz(int kat, int dlugosc, int wysokosc) {
+        Macierz matrix = new Macierz();
+        obrocMacierz(matrix, kat, dlugosc, wysokosc);
         int lewo = 0;
         int gora = 0;
         float powiekszenie = MainActivity.powiekszenie / (float)100;
-        if(czyPionowyObraz(dlugosc, wysokosc)) {
-            if(MainActivity.powiekszenie == 0) {
-                matrix.postScale(MainActivity.rozdzielczosc.y / (float) wysokosc, MainActivity.rozdzielczosc.y / (float) wysokosc);
-                int docelowadlugosc = obliczDlugoscProporcjonalnie(dlugosc, wysokosc, MainActivity.rozdzielczosc.y);
-                lewo = (MainActivity.rozdzielczosc.x - docelowadlugosc) / 2;
-            }
-            if(MainActivity.powiekszenie == 100) {
-                lewo = (MainActivity.rozdzielczosc.x - dlugosc) / 2;
-                gora = (MainActivity.rozdzielczosc.y - wysokosc) / 2;
-                lewo = lewo - MainActivity.xprzesun * 300;
-                gora = gora - MainActivity.yprzesun * 300;
-                lewo = poprawLewo(lewo, (int) (powiekszenie * dlugosc));
-                gora = poprawGora(gora, (int) (powiekszenie * wysokosc));
-            }
-            if((MainActivity.powiekszenie != 100) && (MainActivity.powiekszenie != 0)) {
-                matrix.postScale(powiekszenie, powiekszenie);
-                lewo = (int) ((MainActivity.rozdzielczosc.x - dlugosc * powiekszenie) / 2);
-                gora = (int) ((MainActivity.rozdzielczosc.y - wysokosc * powiekszenie) / 2);
-                lewo = (int) (lewo - MainActivity.xprzesun * 300 * powiekszenie);
-                gora = (int) (gora - MainActivity.yprzesun * 300 * powiekszenie);
-                lewo = poprawLewo(lewo, (int) (powiekszenie * dlugosc));
-                gora = poprawGora(gora, (int) (powiekszenie * wysokosc));
-            }
-        } else {
-            if(MainActivity.powiekszenie == 0) {
-                matrix.postScale(MainActivity.rozdzielczosc.x / (float) dlugosc, MainActivity.rozdzielczosc.x / (float) dlugosc);
-                int docelowawysokosc = obliczDlugoscProporcjonalnie(wysokosc, dlugosc, MainActivity.rozdzielczosc.x);
-                gora = (MainActivity.rozdzielczosc.y - docelowawysokosc) / 2;
-            }
-            if(MainActivity.powiekszenie == 100) {
-                lewo = (MainActivity.rozdzielczosc.x - dlugosc) / 2;
-                gora = (MainActivity.rozdzielczosc.y - wysokosc) / 2;
-                lewo = lewo - MainActivity.xprzesun * 300;
-                gora = gora - MainActivity.yprzesun * 300;
-                lewo = poprawLewo(lewo, (int) (powiekszenie * dlugosc));
-                gora = poprawGora(gora, (int) (powiekszenie * wysokosc));
-            }
-            if((MainActivity.powiekszenie != 100) && (MainActivity.powiekszenie != 0)) {
-                matrix.postScale(powiekszenie, powiekszenie);
-                lewo = (int) ((MainActivity.rozdzielczosc.x - dlugosc * powiekszenie) / 2);
-                gora = (int) ((MainActivity.rozdzielczosc.y - wysokosc * powiekszenie) / 2);
-                lewo = (int) (lewo - MainActivity.xprzesun * 300 * powiekszenie);
-                gora = (int) (gora - MainActivity.yprzesun * 300 * powiekszenie);
-                lewo = poprawLewo(lewo, (int) (powiekszenie * dlugosc));
-                gora = poprawGora(gora, (int) (powiekszenie * wysokosc));
+        if(MainActivity.powiekszenie == 0) {
+            if(czyPionowyObraz(dlugosc, wysokosc)) {
+                powiekszenie = MainActivity.rozdzielczosc.y / (float) wysokosc;
+            } else {
+                powiekszenie = MainActivity.rozdzielczosc.x / (float) dlugosc;
             }
         }
+        if(MainActivity.powiekszenie == 100) {
+            lewo = (MainActivity.rozdzielczosc.x - dlugosc) / 2;
+            gora = (MainActivity.rozdzielczosc.y - wysokosc) / 2;
+            lewo = lewo - MainActivity.xprzesun * ((dlugosc - MainActivity.rozdzielczosc.x) / 2 / 10);
+            gora = gora - MainActivity.yprzesun * ((wysokosc - MainActivity.rozdzielczosc.y) / 2 / 10);
+            lewo = poprawLewo(lewo, (int) (powiekszenie * dlugosc));
+            gora = poprawGora(gora, (int) (powiekszenie * wysokosc));
+        } else {
+            matrix.postScale(powiekszenie, powiekszenie);
+            matrix.powiekszenie = powiekszenie;
+            lewo = (int) ((MainActivity.rozdzielczosc.x - dlugosc * powiekszenie) / 2);
+            gora = (int) ((MainActivity.rozdzielczosc.y - wysokosc * powiekszenie) / 2);
+            lewo = (int) (lewo - MainActivity.xprzesun * ((dlugosc * powiekszenie - MainActivity.rozdzielczosc.x) / 2 / 10));
+            gora = (int) (gora - MainActivity.yprzesun * ((wysokosc * powiekszenie - MainActivity.rozdzielczosc.y) / 2 / 10));
+            lewo = poprawLewo(lewo, (int) (powiekszenie * dlugosc));
+            gora = poprawGora(gora, (int) (powiekszenie * wysokosc));
+        }
         matrix.postTranslate(lewo, gora);
+        matrix.lewo = lewo;
+        matrix.gora = gora;
         return matrix;
+    }
+
+    private float znajdzSkaleMiniatury(int dlugosc, int wysokosc) {
+        float powiekszenie;
+        /*if(czyPionowyObraz(dlugosc, wysokosc)) {
+            powiekszenie = MainActivity.rozdzielczosc.y / (float)5 / (float) wysokosc;
+        } else {
+            powiekszenie = MainActivity.rozdzielczosc.x / (float)5 / (float) dlugosc;
+        }*/
+        int max = Math.max(wysokosc, dlugosc);
+        powiekszenie = 300 / (float)max;
+        return powiekszenie;
+    }
+
+    private void rysujObwod(Canvas canvas, int dlugosc, int wysokosc, float powiekszenie) {
+        int lewoobwodu = (int) (MainActivity.rozdzielczosc.x - powiekszenie * dlugosc - 20 - 5);
+        int goraobwodu = (int) (MainActivity.rozdzielczosc.y - powiekszenie * wysokosc - 20 - 5);
+        canvas.drawRect(lewoobwodu, goraobwodu, MainActivity.rozdzielczosc.x - 20 + 5, MainActivity.rozdzielczosc.y - 20 + 5, paintobwodmin);
+    }
+
+    private void rysujMiniature(Canvas canvas, Bitmap bitmapa, int dlugosc, int wysokosc, float powiekszenie, int kat) {
+        Macierz matrixmin = new Macierz();
+        obrocMacierz(matrixmin, kat, dlugosc, wysokosc);
+        matrixmin.postScale(powiekszenie, powiekszenie);
+        matrixmin.postTranslate(MainActivity.rozdzielczosc.x - powiekszenie * dlugosc - 20, MainActivity.rozdzielczosc.y - powiekszenie * wysokosc - 20);
+        canvas.drawBitmap(bitmapa, matrixmin, paintfilter);
+    }
+
+    private void rysujWidocznyObszar(Canvas canvas, int dlugosc, int wysokosc, float powiekszenie, Macierz matrix) {
+        int dlugoscminiatury = (int) (powiekszenie * dlugosc);
+        int wysokoscminiatury = (int) (powiekszenie * wysokosc);
+        float powiekszenieobrazu = MainActivity.powiekszenie / (float)100;
+        int dlugoscobrazu = (int) (powiekszenieobrazu * dlugosc);
+        int wysokoscobrazu = (int) (powiekszenieobrazu * wysokosc);
+        float stosunekdlugosciobrazu = MainActivity.rozdzielczosc.x / (float)dlugoscobrazu;
+        float stosunekwysokosciobrazu = MainActivity.rozdzielczosc.y / (float)wysokoscobrazu;
+        int dlugoscobszaru = (int) (stosunekdlugosciobrazu * dlugoscminiatury);
+        int wysokoscobszaru = (int) (stosunekwysokosciobrazu * wysokoscminiatury);
+        if(dlugoscobszaru > dlugoscminiatury) {
+            dlugoscobszaru = dlugoscminiatury;
+        }
+        if(wysokoscobszaru > wysokoscminiatury) {
+            wysokoscobszaru = wysokoscminiatury;
+        }
+        int lewoobwodu = (int) (MainActivity.rozdzielczosc.x - powiekszenie * dlugosc - 20);
+        int goraobwodu = (int) (MainActivity.rozdzielczosc.y - powiekszenie * wysokosc - 20);
+        int lewoobrazu = matrix.lewo;
+        int goraobrazu = matrix.gora;
+        float lewoobrazustosunek = Math.abs(lewoobrazu / ((float)dlugosc * (MainActivity.powiekszenie / (float)100)));
+        float goraobrazustosunek = Math.abs(goraobrazu / ((float)wysokosc * (MainActivity.powiekszenie / (float)100)));
+        if(lewoobrazu > 0) {
+            lewoobrazustosunek = 0;
+        }
+        if(goraobrazu > 0) {
+            goraobrazustosunek = 0;
+        }
+        lewoobwodu = (int) (lewoobwodu + lewoobrazustosunek * dlugoscminiatury);
+        goraobwodu = (int) (goraobwodu + goraobrazustosunek * wysokoscminiatury);
+        canvas.drawRect(lewoobwodu, goraobwodu, lewoobwodu + dlugoscobszaru, goraobwodu + wysokoscobszaru, paintwidocznyobszar);
+    }
+
+    private void rysujPodglad(Canvas canvas, Bitmap bitmapa, Macierz matrix, int dlugosc, int wysokosc, int kat) {
+        float powiekszenie = znajdzSkaleMiniatury(dlugosc, wysokosc);
+        rysujObwod(canvas, dlugosc, wysokosc, powiekszenie);
+        rysujMiniature(canvas, bitmapa, dlugosc, wysokosc, powiekszenie, kat);
+        rysujWidocznyObszar(canvas, dlugosc, wysokosc, powiekszenie, matrix);
     }
 
     private void rysujObraz(int ktoryplik) {
@@ -211,11 +269,18 @@ public class WatekRysuj extends Thread {
                     dlugosc = bitmapa.getHeight();
                     wysokosc = bitmapa.getWidth();
                 }
-                Matrix macierz = stworzMacierz(kat, dlugosc, wysokosc);
+                Macierz macierz = stworzMacierz(kat, dlugosc, wysokosc);
                 canvas = MainActivity.surface.surfaceHolder.lockCanvas();
                 canvas.drawColor(Color.BLACK);
-                canvas.drawBitmap(bitmapa, macierz, null);
-                naniesInfo(canvas, ktoryplik);
+                if(MainActivity.powiekszenie == 100) {
+                    canvas.drawBitmap(bitmapa, macierz, null);
+                } else {
+                    canvas.drawBitmap(bitmapa, macierz, paintfilter);
+                }
+                if(MainActivity.powiekszenie != 0) {
+                    rysujPodglad(canvas, bitmapa, macierz, dlugosc, wysokosc, kat);
+                    naniesInfo(canvas, ktoryplik);
+                }
                 MainActivity.surface.surfaceHolder.unlockCanvasAndPost(canvas);
                 MainActivity.ukryjKlepsydre();
             } else {

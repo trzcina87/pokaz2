@@ -267,6 +267,28 @@ public class MainActivity extends AppCompatActivity {
                     MainActivity.powiekszenie = MainActivity.powiekszenie + 10;
                     AppService.service.watekrysuj.odswiez = true;
                 }
+                if(MainActivity.powiekszenie == 0) {
+                    try {
+                        Bitmap bitmapa = AppService.service.watekwczytaj.pliki[ktoryplik].bitmapa;
+                        int kat = AppService.service.watekwczytaj.pliki[ktoryplik].orient;
+                        if(bitmapa != null) {
+                            int dlugosc = bitmapa.getWidth();
+                            int wysokosc = bitmapa.getHeight();
+                            if (WatekRysuj.czyOdwrocic(kat)) {
+                                dlugosc = bitmapa.getHeight();
+                                wysokosc = bitmapa.getWidth();
+                            }
+                            if(WatekRysuj.czyPionowyObraz(dlugosc, wysokosc)) {
+                                MainActivity.powiekszenie = Rozne.zaokraglijWGoreDo10(MainActivity.rozdzielczosc.y * 100 / wysokosc);
+                            } else {
+                                MainActivity.powiekszenie = Rozne.zaokraglijWGoreDo10(MainActivity.rozdzielczosc.x * 100 / dlugosc);
+                            }
+                        }
+                        AppService.service.watekrysuj.odswiez = true;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
                 return true;
             }
         }
