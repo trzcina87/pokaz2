@@ -291,8 +291,8 @@ public class WatekRysuj extends Thread {
                 }
                 if(MainActivity.powiekszenie != 0) {
                     rysujPodglad(canvas, bitmapa, macierz, dlugosc, wysokosc, kat);
-                    naniesInfo(canvas, ktoryplik);
                 }
+                naniesInfo(canvas, ktoryplik);
                 MainActivity.surface.surfaceHolder.unlockCanvasAndPost(canvas);
                 MainActivity.ukryjKlepsydre();
             } else {
