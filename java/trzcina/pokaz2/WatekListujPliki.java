@@ -115,6 +115,7 @@ public class WatekListujPliki extends Thread {
                         MainActivity.trybopcji = false;
                         OpcjeProgramu.zapiszOpcje();
                         AppService.service.watekwczytaj.przeladuj = true;
+                        AppService.service.watekwczytaj.zacznijod = (String)view.getTag();
                         AppService.service.watekrysuj.odswiez = true;
                         Widoki.activitylayout.removeView(Widoki.opcjelayout);
                     }
@@ -138,16 +139,27 @@ public class WatekListujPliki extends Thread {
         return podpisminiatury;
     }
 
-    private LinearLayout utworzMiniature(String podpis, Bitmap bitmapa, boolean katalog, String tag) {
+    private LinearLayout utworzMiniature(String podpis, Bitmap bitmapa, boolean katalog, String tag, String obecnyplik) {
         LinearLayout layoutminiatury = stworzLayoutMiniatury();
         ImageButton obrazminiatury = utworzObrazMiniatury(bitmapa, katalog, tag);
         layoutminiatury.addView(obrazminiatury);
         TextView podpisminiatury = utworzPodpisMiniatury(podpis);
         layoutminiatury.addView(podpisminiatury);
+        if(tag.equals(obecnyplik)) {
+            layoutminiatury.requestFocus();
+        }
         return layoutminiatury;
     }
 
     public void wyswietlZawartoscFolderu() {
+        String obecnyplik = null;
+        if(focusnawstecz == false) {
+            try {
+                obecnyplik = AppService.service.watekwczytaj.pliki[MainActivity.ktoryplik].sciezka;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         wyczyscScroolView();
         if(! new File(OpcjeProgramu.folder).isDirectory()) {
             OpcjeProgramu.folder = "/";
@@ -164,16 +176,16 @@ public class WatekListujPliki extends Thread {
         } else {
             wstecz = "/";
         }
-        LinearLayout miniaturawstecz = utworzMiniature("..", Bitmapy.folderbitmap, true, wstecz);
+        LinearLayout miniaturawstecz = utworzMiniature("..", Bitmapy.folderbitmap, true, wstecz, obecnyplik);
         if(focusnawstecz) {
             miniaturawstecz.requestFocus();
         }
         MainActivity.dodajViewDoView(rzadminiatur, miniaturawstecz);
         iloscminiatur = iloscminiatur + 1;
-        LinearLayout miniaturasieciowa = utworzMiniature("TE", Bitmapy.foldersieciowybitmap, true, "SERWERTE");
+        LinearLayout miniaturasieciowa = utworzMiniature("TE", Bitmapy.foldersieciowybitmap, true, "SERWERTE", obecnyplik);
         MainActivity.dodajViewDoView(rzadminiatur, miniaturasieciowa);
         iloscminiatur = iloscminiatur + 1;
-        LinearLayout miniaturaroot = utworzMiniature("/", Bitmapy.folderroot, true, "/");
+        LinearLayout miniaturaroot = utworzMiniature("/", Bitmapy.folderroot, true, "/", obecnyplik);
         MainActivity.dodajViewDoView(rzadminiatur, miniaturaroot);
         iloscminiatur = iloscminiatur + 1;
         if(plikiobecne != null) {
@@ -183,7 +195,7 @@ public class WatekListujPliki extends Thread {
                     if (iloscminiatur % 10 == 0) {
                         rzadminiatur = stworzRzadMiniatur();
                     }
-                    LinearLayout miniaturafolderu = utworzMiniature(plikiobecne[i].getName(), Bitmapy.folderbitmap, true, plikiobecne[i].getAbsolutePath() + "/");
+                    LinearLayout miniaturafolderu = utworzMiniature(plikiobecne[i].getName(), Bitmapy.folderbitmap, true, plikiobecne[i].getAbsolutePath() + "/", obecnyplik);
                     MainActivity.dodajViewDoView(rzadminiatur, miniaturafolderu);
                     iloscminiatur = iloscminiatur + 1;
                 }
@@ -191,7 +203,7 @@ public class WatekListujPliki extends Thread {
                     if (iloscminiatur % 10 == 0) {
                         rzadminiatur = stworzRzadMiniatur();
                     }
-                    LinearLayout miniaturajpg = utworzMiniature(plikiobecne[i].getName(), Bitmapy.jpgbitmap, false, plikiobecne[i].getAbsolutePath());
+                    LinearLayout miniaturajpg = utworzMiniature(plikiobecne[i].getName(), Bitmapy.jpgbitmap, false, plikiobecne[i].getAbsolutePath(), obecnyplik);
                     MainActivity.dodajViewDoView(rzadminiatur, miniaturajpg);
                     iloscminiatur = iloscminiatur + 1;
                 }

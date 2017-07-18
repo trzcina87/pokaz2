@@ -12,12 +12,14 @@ public class WatekWczytaj extends Thread {
     public volatile boolean przeladuj;
     public PlikJPG[] pliki;
     public int iloscplikow;
+    public String zacznijod;
 
     public WatekWczytaj() {
         pliki = null;
         przeladuj = false;
         iloscplikow = 0;
         zakoncz = false;
+        zacznijod = null;
     }
 
     private void wyczyscObecnePliki() {
@@ -68,6 +70,14 @@ public class WatekWczytaj extends Thread {
                 }
             }
         }
+        if(zacznijod != null) {
+            for(int i = 0; i < plikiwkatalogu.length; i++) {
+                if(plikiwkatalogu[i].getAbsolutePath().equals(zacznijod)) {
+                    zamienWTab(plikiwkatalogu, 0, i);
+                }
+            }
+        }
+        zacznijod = null;
     }
 
     private void wczytajNowaListe() {
