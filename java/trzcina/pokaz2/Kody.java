@@ -13,5 +13,6 @@ public class Kody {
     public static Integer[] ORG = {7};
     public static Integer[] POWIEKSZ = {70, 24};
     public static Integer[] POMNIEJSZ = {69, 25};
+    public static Integer[] ANIMACJA = {10, 29};
 
 }

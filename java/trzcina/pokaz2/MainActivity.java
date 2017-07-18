@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     public static int ktoryplik;
     public static boolean trybopcji;
     public static String folderroboczy;
+    public static boolean animacja;
 
     private volatile long ostatniapauza;
 
@@ -61,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         trybopcji = false;
         ktoryplik = 0;
         ostatniapauza = 0;
+        animacja = false;
     }
 
     private void ustawEkran() {
@@ -124,6 +127,14 @@ public class MainActivity extends AppCompatActivity {
                             ktoryplik = iloscplikow - 1;
                         }
                         resetujPrzesuj();
+                        if((OpcjeProgramu.pokazslidow == 1) && (MainActivity.animacja)) {
+                            Random random = new Random();
+                            int znakx = Rozne.znak(random.nextInt(2));
+                            int znaky = Rozne.znak(random.nextInt(2));
+                            AppService.service.watekanimacja.startx = (40 + random.nextInt(61)) * znakx;
+                            AppService.service.watekanimacja.starty = (40 + random.nextInt(61)) * znaky;
+                            AppService.service.watekanimacja.zacznij = true;
+                        }
                     }
                 } else {
                     try {
@@ -154,6 +165,14 @@ public class MainActivity extends AppCompatActivity {
                             ktoryplik = 0;
                         }
                         resetujPrzesuj();
+                        if((OpcjeProgramu.pokazslidow == 1) && (MainActivity.animacja)) {
+                            Random random = new Random();
+                            int znakx = Rozne.znak(random.nextInt(2));
+                            int znaky = Rozne.znak(random.nextInt(2));
+                            AppService.service.watekanimacja.startx = (40 + random.nextInt(61)) * znakx;
+                            AppService.service.watekanimacja.starty = (40 + random.nextInt(61)) * znaky;
+                            AppService.service.watekanimacja.zacznij = true;
+                        }
                     }
                 } else {
                     try {
@@ -309,6 +328,17 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+
+    private boolean obsluzAnimacja(int key) {
+        if(trybopcji == false) {
+            if (Arrays.asList(Kody.ANIMACJA).contains(key)) {
+                animacja = !animacja;
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void ustawPlayPauza() {
         final long lokalnaostatniapauza = System.currentTimeMillis();
         ostatniapauza = lokalnaostatniapauza;
@@ -333,6 +363,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }).start();
     }
+
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
@@ -370,6 +401,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
             if(obsluzPomniejsz(key)) {
+                return true;
+            }
+            if(obsluzAnimacja(key)) {
                 return true;
             }
         }

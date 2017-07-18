@@ -7,6 +7,8 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
 
+import java.util.Random;
+
 public class WatekRysuj extends Thread {
 
     public volatile boolean zakoncz;
@@ -167,6 +169,13 @@ public class WatekRysuj extends Thread {
             } else {
                 powiekszenie = MainActivity.rozdzielczosc.x / (float) dlugosc;
             }
+            if((OpcjeProgramu.pokazslidow == 1) && (MainActivity.animacja)) {
+                if(czyPionowyObraz(dlugosc, wysokosc)) {
+                    powiekszenie = (MainActivity.rozdzielczosc.y + 200) / (float) wysokosc;
+                } else {
+                    powiekszenie = (MainActivity.rozdzielczosc.x + 200) /(float) dlugosc;
+                }
+            }
         }
         if(MainActivity.powiekszenie == 100) {
             lewo = (MainActivity.rozdzielczosc.x - dlugosc) / 2;
@@ -188,6 +197,9 @@ public class WatekRysuj extends Thread {
         matrix.postTranslate(lewo, gora);
         matrix.lewo = lewo;
         matrix.gora = gora;
+        if((MainActivity.animacja) && (MainActivity.powiekszenie == 0) && (OpcjeProgramu.pokazslidow == 1)){
+            matrix.postTranslate(AppService.service.watekanimacja.x, AppService.service.watekanimacja.y);
+        }
         return matrix;
     }
 
@@ -317,7 +329,9 @@ public class WatekRysuj extends Thread {
                 if(odswiez) {
                     odswiez = false;
                     rysujObraz(ktoryplikrysowac);
-                    AppService.service.watekodlicz.ostatniczas = System.currentTimeMillis();
+                    if(AppService.service.watekodlicz.ostatniczas > System.currentTimeMillis()) {
+                        AppService.service.watekodlicz.ostatniczas = System.currentTimeMillis();
+                    }
                 }
             } else {
                 rysujBrakPlikow();

@@ -15,6 +15,7 @@ public class AppService extends Service {
     WatekWczytaj watekwczytaj;
     WatekRysuj watekrysuj;
     WatekOdlicz watekodlicz;
+    WatekAnimacja watekanimacja;
 
     public AppService() {
         wateklistujpliki = null;
@@ -22,6 +23,7 @@ public class AppService extends Service {
         watekwczytaj = null;
         watekrysuj = null;
         watekodlicz = null;
+        watekanimacja = null;
         service = this;
     }
 
@@ -38,11 +40,13 @@ public class AppService extends Service {
             watekwczytaj = new WatekWczytaj();
             watekrysuj = new WatekRysuj();
             watekodlicz = new WatekOdlicz();
+            watekanimacja = new WatekAnimacja();
             wateklistujpliki.start();
             watekminiatury.start();
             watekwczytaj.start();
             watekrysuj.start();
             watekodlicz.start();
+            watekanimacja.start();
             watekwczytaj.przeladuj = true;
             watekrysuj.odswiez = true;
         }
@@ -111,6 +115,17 @@ public class AppService extends Service {
         }
     }
 
+    private void zakonczWatekAnimacja() {
+        watekanimacja.zakoncz = true;
+        watekanimacja.interrupt();
+        while(watekanimacja.isAlive()) {
+            try {
+                watekanimacja.join();
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+
     private void odmontujKatalog() {
         if(wateklistujpliki.montowaniete != null) {
             Proces.odmontuj(wateklistujpliki.montowaniete);
@@ -125,6 +140,7 @@ public class AppService extends Service {
         zakonczWatekWczytaj();
         zakonczWatekRysuj();
         zakonczWatekOdlicz();
+        zakonczWatekAnimacja();
         odmontujKatalog();
         Toast.makeText(MainActivity.activity.getApplicationContext(), "Zakonczono Pokaz2!", Toast.LENGTH_SHORT).show();
     }

@@ -1,5 +1,9 @@
 package trzcina.pokaz2;
 
+import android.util.Log;
+
+import java.util.Random;
+
 public class WatekOdlicz extends Thread {
 
     public volatile boolean zakoncz;
@@ -25,6 +29,14 @@ public class WatekOdlicz extends Thread {
                             MainActivity.activity.resetujPrzesuj();
                             ostatniczas = 2 * System.currentTimeMillis();
                             AppService.service.watekrysuj.odswiez = true;
+                        }
+                        if(MainActivity.animacja) {
+                            Random random = new Random();
+                            int znakx = Rozne.znak(random.nextInt(2));
+                            int znaky = Rozne.znak(random.nextInt(2));
+                            AppService.service.watekanimacja.startx = (40 + random.nextInt(61)) * znakx;
+                            AppService.service.watekanimacja.starty = (40 + random.nextInt(61)) * znaky;
+                            AppService.service.watekanimacja.zacznij = true;
                         }
                     }
                 }
