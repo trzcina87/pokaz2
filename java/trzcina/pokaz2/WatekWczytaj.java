@@ -1,9 +1,6 @@
 package trzcina.pokaz2;
 
-import android.util.Log;
-
 import java.io.File;
-import java.util.Arrays;
 import java.util.Random;
 
 public class WatekWczytaj extends Thread {
@@ -63,9 +60,11 @@ public class WatekWczytaj extends Thread {
         Random rn = new Random();
         if(plikiwkatalogu != null) {
             if(plikiwkatalogu.length > 0) {
-                for (int i = 0; i < plikiwkatalogu.length * 2; i++) {
-                    int n1 = rn.nextInt(plikiwkatalogu.length);
-                    zamienWTab(plikiwkatalogu, i, n1);
+                for(int j = 0; j < 2; j++) {
+                    for (int i = 0; i < plikiwkatalogu.length; i++) {
+                        int n1 = rn.nextInt(plikiwkatalogu.length);
+                        zamienWTab(plikiwkatalogu, i, n1);
+                    }
                 }
             }
         }
@@ -161,28 +160,28 @@ public class WatekWczytaj extends Thread {
                             }
                         }
                     }
-                    if (pliki[ktoryplikwczytac].bitmapa == null) {
+                    if ((pliki[ktoryplikwczytac].bitmapa == null) && (przeladuj == false) && (zakoncz == false)){
                         boolean czyzaladowano = pliki[ktoryplikwczytac].zaladuj();
                         if(czyzaladowano == false) {
                             wyczyscObecnePliki();
                         }
                     }
-                    if ((pliki[ktoryplikwczytac].bitmapa == null) && (przeladuj == false)) {
+                    if ((pliki[ktoryplikwczytac].bitmapa == null) && (przeladuj == false) && (zakoncz == false)) {
                         pliki[ktoryplikwczytac].zaladuj();
                     }
-                    if ((pliki[nastepny1].bitmapa == null) && (przeladuj == false)) {
+                    if ((pliki[nastepny1].bitmapa == null) && (przeladuj == false) && (zakoncz == false)) {
                         pliki[nastepny1].zaladuj();
                     }
-                    if ((pliki[nastepny2].bitmapa == null) && (przeladuj == false)) {
+                    if ((pliki[nastepny2].bitmapa == null) && (przeladuj == false) && (zakoncz == false)) {
                         pliki[nastepny2].zaladuj();
                     }
-                    if ((pliki[poprzedni1].bitmapa == null) && (przeladuj == false)) {
+                    if ((pliki[poprzedni1].bitmapa == null) && (przeladuj == false) && (zakoncz == false)) {
                         pliki[poprzedni1].zaladuj();
                     }
-                    if ((pliki[nastepny3].bitmapa == null) && (przeladuj == false)) {
+                    if ((pliki[nastepny3].bitmapa == null) && (przeladuj == false) && (zakoncz == false)) {
                         pliki[nastepny3].zaladuj();
                     }
-                    if ((pliki[poprzedni2].bitmapa == null) && (przeladuj == false)) {
+                    if ((pliki[poprzedni2].bitmapa == null) && (przeladuj == false) && (zakoncz == false)) {
                         pliki[poprzedni2].zaladuj();
                     }
                 }
