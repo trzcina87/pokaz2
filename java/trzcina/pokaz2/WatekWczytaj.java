@@ -63,10 +63,9 @@ public class WatekWczytaj extends Thread {
         Random rn = new Random();
         if(plikiwkatalogu != null) {
             if(plikiwkatalogu.length > 0) {
-                for (int i = 0; i < plikiwkatalogu.length * 100; i++) {
+                for (int i = 0; i < plikiwkatalogu.length * 2; i++) {
                     int n1 = rn.nextInt(plikiwkatalogu.length);
-                    int n2 = rn.nextInt(plikiwkatalogu.length);
-                    zamienWTab(plikiwkatalogu, n1, n2);
+                    zamienWTab(plikiwkatalogu, i, n1);
                 }
             }
         }
@@ -168,22 +167,22 @@ public class WatekWczytaj extends Thread {
                             wyczyscObecnePliki();
                         }
                     }
-                    if (pliki[ktoryplikwczytac].bitmapa == null) {
+                    if ((pliki[ktoryplikwczytac].bitmapa == null) && (przeladuj == false)) {
                         pliki[ktoryplikwczytac].zaladuj();
                     }
-                    if (pliki[nastepny1].bitmapa == null) {
+                    if ((pliki[nastepny1].bitmapa == null) && (przeladuj == false)) {
                         pliki[nastepny1].zaladuj();
                     }
-                    if (pliki[nastepny2].bitmapa == null) {
+                    if ((pliki[nastepny2].bitmapa == null) && (przeladuj == false)) {
                         pliki[nastepny2].zaladuj();
                     }
-                    if (pliki[poprzedni1].bitmapa == null) {
+                    if ((pliki[poprzedni1].bitmapa == null) && (przeladuj == false)) {
                         pliki[poprzedni1].zaladuj();
                     }
-                    if (pliki[nastepny3].bitmapa == null) {
+                    if ((pliki[nastepny3].bitmapa == null) && (przeladuj == false)) {
                         pliki[nastepny3].zaladuj();
                     }
-                    if (pliki[poprzedni2].bitmapa == null) {
+                    if ((pliki[poprzedni2].bitmapa == null) && (przeladuj == false)) {
                         pliki[poprzedni2].zaladuj();
                     }
                 }

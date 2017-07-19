@@ -7,8 +7,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
 
-import java.util.Random;
-
 public class WatekRysuj extends Thread {
 
     public volatile boolean zakoncz;
@@ -101,7 +99,7 @@ public class WatekRysuj extends Thread {
         if (MainActivity.poziominfo == 4) {
             Rect rozmiarytekstu = new Rect();
             paintexifwhite.getTextBounds(exif, 0, exif.length(), rozmiarytekstu);
-            canvas.drawRect(0, MainActivity.rozdzielczosc.y - rozmiarytekstu.height(), rozmiarytekstu.width() + 5, MainActivity.rozdzielczosc.y, paintexifblack);
+            canvas.drawRect(0, MainActivity.rozdzielczosc.y - rozmiarytekstu.height() - 1, rozmiarytekstu.width() + 10, MainActivity.rozdzielczosc.y, paintexifblack);
             canvas.drawText(exif, 2, MainActivity.rozdzielczosc.y - 2, paintexifwhite);
         }
     }
@@ -190,9 +188,21 @@ public class WatekRysuj extends Thread {
         matrix.postTranslate(lewo, gora);
         matrix.lewo = lewo;
         matrix.gora = gora;
-        if((MainActivity.animacja) && (MainActivity.powiekszenie == 0) && (OpcjeProgramu.pokazslidow == 1)){
-            matrix.postTranslate(AppService.service.watekanimacja.x, AppService.service.watekanimacja.y);
-        }
+        return matrix;
+    }
+
+    private Macierz stworzMacierzDlaAnimacji(int dlugosc, int wysokosc) {
+        Macierz matrix = new Macierz();
+        int lewo = (MainActivity.rozdzielczosc.x - dlugosc) / 2;
+        int gora = (MainActivity.rozdzielczosc.y - wysokosc) / 2;
+        lewo = lewo - MainActivity.xprzesun * ((dlugosc - MainActivity.rozdzielczosc.x) / 2 / 10);
+        gora = gora - MainActivity.yprzesun * ((wysokosc - MainActivity.rozdzielczosc.y) / 2 / 10);
+        lewo = poprawLewo(lewo, dlugosc);
+        gora = poprawGora(gora, wysokosc);
+        matrix.postTranslate(lewo, gora);
+        matrix.lewo = lewo;
+        matrix.gora = gora;
+        matrix.postTranslate(AppService.service.watekanimacja.x, AppService.service.watekanimacja.y);
         return matrix;
     }
 
@@ -262,7 +272,7 @@ public class WatekRysuj extends Thread {
         rysujWidocznyObszar(canvas, dlugosc, wysokosc, powiekszenie, matrix);
     }
 
-    private void uzupelnijBitmapeSlajd(int ktoryplik, int dlugosc, int wysokosc, Bitmap bitmap) {
+    private void uzupelnijBitmapeSlajd(int ktoryplik, int kat, int dlugosc, int wysokosc, Bitmap bitmap) {
         float powiekszenie;
         if(czyPionowyObraz(dlugosc, wysokosc)) {
             powiekszenie = (MainActivity.rozdzielczosc.y + 200) / (float) wysokosc;
@@ -270,8 +280,30 @@ public class WatekRysuj extends Thread {
             powiekszenie = (MainActivity.rozdzielczosc.x + 200) /(float) dlugosc;
         }
         Macierz matrix = new Macierz();
+        obrocMacierz(matrix, kat, dlugosc, wysokosc);
         matrix.postScale(powiekszenie, powiekszenie);
         AppService.service.watekwczytaj.pliki[ktoryplik].bitmapaslajd = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+    }
+
+    public static boolean czyAnimowac() {
+        if((MainActivity.animacja == true) && (MainActivity.powiekszenie == 0) && (OpcjeProgramu.pokazslidow == 1)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void animujBitmape(Bitmap bitmapaslajd) {
+        int dlugosc = bitmapaslajd.getWidth();
+        int wysokosc = bitmapaslajd.getHeight();
+        int lewo = (MainActivity.rozdzielczosc.x - dlugosc) / 2;
+        int gora = (MainActivity.rozdzielczosc.y - wysokosc) / 2;
+        lewo = poprawLewo(lewo, dlugosc);
+        gora = poprawGora(gora, wysokosc);
+        Canvas canvas = MainActivity.surface.surfaceHolder.lockCanvas();
+        canvas.drawColor(Color.BLACK);
+        canvas.drawBitmap(bitmapaslajd, lewo + AppService.service.watekanimacja.x, gora + AppService.service.watekanimacja.y, paintfilter);
+        MainActivity.surface.surfaceHolder.unlockCanvasAndPost(canvas);
     }
 
     private void rysujObraz(int ktoryplik) {
@@ -287,21 +319,12 @@ public class WatekRysuj extends Thread {
                     dlugosc = bitmapa.getHeight();
                     wysokosc = bitmapa.getWidth();
                 }
-                if((MainActivity.animacja == true) && (MainActivity.powiekszenie == 0) && (OpcjeProgramu.pokazslidow == 1)) {
+                if(czyAnimowac()) {
                     if(bitmapaslajd == null) {
-                        uzupelnijBitmapeSlajd(ktoryplik, dlugosc, wysokosc, bitmapa);
+                        uzupelnijBitmapeSlajd(ktoryplik, kat, dlugosc, wysokosc, bitmapa);
                         bitmapaslajd = AppService.service.watekwczytaj.pliki[ktoryplik].bitmapaslajd;
-                        dlugosc = bitmapaslajd.getWidth();
-                        wysokosc = bitmapaslajd.getHeight();
-                        if(czyOdwrocic(kat)) {
-                            dlugosc = bitmapaslajd.getHeight();
-                            wysokosc = bitmapaslajd.getWidth();
-                        }
-                        Macierz macierz = stworzMacierz(kat, dlugosc, wysokosc);
-                        canvas = MainActivity.surface.surfaceHolder.lockCanvas();
-                        canvas.drawColor(Color.BLACK);
-                        canvas.drawBitmap(bitmapaslajd, macierz, paintfilter);
                     }
+                    animujBitmape(bitmapaslajd);
                 } else {
                     Macierz macierz = stworzMacierz(kat, dlugosc, wysokosc);
                     canvas = MainActivity.surface.surfaceHolder.lockCanvas();
@@ -314,9 +337,9 @@ public class WatekRysuj extends Thread {
                     if (MainActivity.powiekszenie != 0) {
                         rysujPodglad(canvas, bitmapa, macierz, dlugosc, wysokosc, kat);
                     }
+                    naniesInfo(canvas, ktoryplik);
+                    MainActivity.surface.surfaceHolder.unlockCanvasAndPost(canvas);
                 }
-                naniesInfo(canvas, ktoryplik);
-                MainActivity.surface.surfaceHolder.unlockCanvasAndPost(canvas);
                 MainActivity.ukryjKlepsydre();
             } else {
                 MainActivity.pokazKlepsydre();

@@ -30,7 +30,7 @@ public class WatekOdlicz extends Thread {
                             ostatniczas = 2 * System.currentTimeMillis();
                             AppService.service.watekrysuj.odswiez = true;
                         }
-                        if(MainActivity.animacja) {
+                        if(WatekRysuj.czyAnimowac()) {
                             Random random = new Random();
                             int znakx = Rozne.znak(random.nextInt(2));
                             int znaky = Rozne.znak(random.nextInt(2));

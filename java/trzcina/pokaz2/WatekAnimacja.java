@@ -20,7 +20,7 @@ public class WatekAnimacja extends Thread {
     public void run() {
         while(zakoncz == false) {
             Rozne.czekaj(1);
-            if((MainActivity.animacja) && (OpcjeProgramu.pokazslidow == 1)) {
+            if(WatekRysuj.czyAnimowac()) {
                 if(zacznij == true) {
                     zacznij = false;
                     opoznienie = Math.abs((int) (OpcjeProgramu.czaszdjecia * 1000 / (float)(2 * starty)));

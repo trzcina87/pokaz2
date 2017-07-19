@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                             ktoryplik = iloscplikow - 1;
                         }
                         resetujPrzesuj();
-                        if((OpcjeProgramu.pokazslidow == 1) && (MainActivity.animacja)) {
+                        if(WatekRysuj.czyAnimowac()) {
                             Random random = new Random();
                             int znakx = Rozne.znak(random.nextInt(2));
                             int znaky = Rozne.znak(random.nextInt(2));
@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                             ktoryplik = 0;
                         }
                         resetujPrzesuj();
-                        if((OpcjeProgramu.pokazslidow == 1) && (MainActivity.animacja)) {
+                        if(WatekRysuj.czyAnimowac()) {
                             Random random = new Random();
                             int znakx = Rozne.znak(random.nextInt(2));
                             int znaky = Rozne.znak(random.nextInt(2));
@@ -333,6 +333,7 @@ public class MainActivity extends AppCompatActivity {
         if(trybopcji == false) {
             if (Arrays.asList(Kody.ANIMACJA).contains(key)) {
                 animacja = !animacja;
+                AppService.service.watekrysuj.odswiez = true;
                 return true;
             }
         }
