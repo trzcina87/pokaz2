@@ -14,6 +14,7 @@ import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AbsoluteLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -333,11 +334,35 @@ public class MainActivity extends AppCompatActivity {
         if(trybopcji == false) {
             if (Arrays.asList(Kody.ANIMACJA).contains(key)) {
                 animacja = !animacja;
+                if(animacja) {
+                    Widoki.activitylayout.addView(Widoki.absolutelayout);
+                } else {
+                    Widoki.activitylayout.removeView(Widoki.absolutelayout);
+                }
                 AppService.service.watekrysuj.odswiez = true;
                 return true;
             }
         }
         return false;
+    }
+
+    public static void uzupelnijTagIBitmapeDoAnimacji(final String tag, final Bitmap bitmapa) {
+        MainActivity.activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Widoki.imageviewanimacja.setImageBitmap(bitmapa);
+                Widoki.imageviewanimacja.setTag(tag);
+            }
+        });
+    }
+
+    public static void uzupelnijParametryAbsoluteLayout(final int dlugosc, final int wysokosc, final int lewo, final int gora) {
+        MainActivity.activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Widoki.imageviewanimacja.setLayoutParams(new AbsoluteLayout.LayoutParams(dlugosc, wysokosc, lewo, gora));
+            }
+        });
     }
 
     private void ustawPlayPauza() {

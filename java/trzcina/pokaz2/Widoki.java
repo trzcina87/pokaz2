@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AbsoluteLayout;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 public class Widoki {
 
     public static LinearLayout opcjelayout;
+    public static AbsoluteLayout absolutelayout;
     public static RelativeLayout activitylayout;
     public static Button buttonzapisz;
     public static Button buttonanuluj;
@@ -42,6 +44,7 @@ public class Widoki {
     public static ProgressBar progressbaropcje;
     public static ImageView imageviewklepsydra;
     public static ImageView imageviewplaypauza;
+    public static ImageView imageviewanimacja;
 
     public static void znajdzWidoki() {
         LayoutInflater inflater = LayoutInflater.from(MainActivity.activity.getApplicationContext());
@@ -64,6 +67,9 @@ public class Widoki {
         progressbaropcje = (ProgressBar) opcjelayout.findViewById(R.id.progressbaropcje);
         imageviewklepsydra = (ImageView) MainActivity.activity.findViewById(R.id.klepsydra);
         imageviewplaypauza = (ImageView) MainActivity.activity.findViewById(R.id.playpauza);
+        absolutelayout = (AbsoluteLayout)inflater.inflate(R.layout.animacja, null);
+        absolutelayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        imageviewanimacja = (ImageView) absolutelayout.findViewById(R.id.imageviewanimacja);
     }
 
 
