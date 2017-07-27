@@ -4,10 +4,10 @@ import java.io.File;
 
 public class OpcjeProgramu {
 
-    public static int pokazslidow;
-    public static int czaszdjecia;
-    public static int losuj;
-    public static String folder;
+    public static volatile int pokazslidow;
+    public static volatile int czaszdjecia;
+    public static volatile int losuj;
+    public static volatile String folder;
 
     private static void wczytajPokazSlidow() {
         int pokazslidowwczytany = Ustawienia.wczytajUstawienieInt("pokazslidow");

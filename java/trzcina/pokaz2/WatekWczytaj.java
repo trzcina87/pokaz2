@@ -71,11 +71,19 @@ public class WatekWczytaj extends Thread {
     }
 
     private void znajdzKlikniety(File[] plikiwkatalogu) {
+        int klikniety = 0;
         if(zacznijod != null) {
+            File[] tabtymczasowa = new File[plikiwkatalogu.length];
             for(int i = 0; i < plikiwkatalogu.length; i++) {
                 if(plikiwkatalogu[i].getAbsolutePath().equals(zacznijod)) {
-                    zamienWTab(plikiwkatalogu, 0, i);
+                    klikniety = i;
                 }
+            }
+            for(int i = 0; i < plikiwkatalogu.length; i++) {
+                tabtymczasowa[i] = plikiwkatalogu[dodaji(i, plikiwkatalogu.length, klikniety)];
+            }
+            for(int i = 0; i < plikiwkatalogu.length; i++) {
+                plikiwkatalogu[i] = tabtymczasowa[i];
             }
         }
         zacznijod = null;
@@ -115,6 +123,14 @@ public class WatekWczytaj extends Thread {
         int temp = liczba + 1;
         if(temp >= ilosc) {
             temp = 0;
+        }
+        return temp;
+    }
+
+    private int dodaji(int liczba, int ilosc, int i) {
+        int temp = liczba + i;
+        if(temp >= ilosc) {
+            temp = temp % ilosc;
         }
         return temp;
     }

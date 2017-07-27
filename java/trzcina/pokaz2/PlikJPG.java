@@ -35,11 +35,9 @@ public class PlikJPG {
 
     public void wyczysc() {
         if(bitmapa != null) {
-            bitmapa.recycle();
             bitmapa = null;
         }
         if(bitmapaslajd != null) {
-            bitmapaslajd.recycle();
             bitmapaslajd = null;
         }
     }

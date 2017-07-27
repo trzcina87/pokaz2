@@ -7,11 +7,11 @@ import java.util.Random;
 public class WatekOdlicz extends Thread {
 
     public volatile boolean zakoncz;
-    public long ostatniczas;
+    public volatile long ostatniczas;
 
     public WatekOdlicz() {
         zakoncz = false;
-        ostatniczas = System.currentTimeMillis();
+        ostatniczas = System.currentTimeMillis() * 2;
     }
 
     public void run() {
@@ -26,6 +26,7 @@ public class WatekOdlicz extends Thread {
                             if (MainActivity.ktoryplik >= iloscplikow) {
                                 MainActivity.ktoryplik = 0;
                             }
+                            Log.e("ODLICZ", String.valueOf(MainActivity.ktoryplik));
                             MainActivity.activity.resetujPrzesuj();
                             ostatniczas = 2 * System.currentTimeMillis();
                             AppService.service.watekrysuj.odswiez = true;

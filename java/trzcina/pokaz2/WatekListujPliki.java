@@ -118,6 +118,7 @@ public class WatekListujPliki extends Thread {
                         AppService.service.watekwczytaj.zacznijod = (String)view.getTag();
                         AppService.service.watekrysuj.odswiez = true;
                         Widoki.activitylayout.removeView(Widoki.opcjelayout);
+                        AppService.service.watekodlicz.ostatniczas = 2 * System.currentTimeMillis();
                     }
                 }
             }

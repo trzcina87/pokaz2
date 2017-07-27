@@ -83,6 +83,7 @@ public class Widoki {
             AppService.service.watekwczytaj.przeladuj = true;
             AppService.service.watekrysuj.odswiez = true;
             activitylayout.removeView(opcjelayout);
+            AppService.service.watekodlicz.ostatniczas = 2 * System.currentTimeMillis();
         }
     }
 

@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.AbsoluteLayout;
 
@@ -342,6 +343,10 @@ public class WatekRysuj extends Thread {
                     naniesInfo(canvas, ktoryplik);
                     MainActivity.surface.surfaceHolder.unlockCanvasAndPost(canvas);
                 }
+                if(AppService.service.watekodlicz.ostatniczas > System.currentTimeMillis()) {
+                    Log.e("ODLICZ", "Aktualizuje ostatniczas: " + System.currentTimeMillis());
+                    AppService.service.watekodlicz.ostatniczas = System.currentTimeMillis();
+                }
                 MainActivity.ukryjKlepsydre();
             } else {
                 MainActivity.pokazKlepsydre();
@@ -377,9 +382,6 @@ public class WatekRysuj extends Thread {
                 if(odswiez) {
                     odswiez = false;
                     rysujObraz(ktoryplikrysowac);
-                    if(AppService.service.watekodlicz.ostatniczas > System.currentTimeMillis()) {
-                        AppService.service.watekodlicz.ostatniczas = System.currentTimeMillis();
-                    }
                 }
             } else {
                 rysujBrakPlikow();
