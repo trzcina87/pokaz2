@@ -6,16 +6,21 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
+
 public class AppService extends Service {
 
-    public static AppService service;
-
-    WatekListujPliki wateklistujpliki;
-    WatekMiniatury watekminiatury;
-    WatekWczytaj watekwczytaj;
-    WatekRysuj watekrysuj;
-    WatekOdlicz watekodlicz;
-    WatekAnimacja watekanimacja;
+    public volatile static AppService service;
+    public volatile static WatekListujPliki wateklistujpliki;
+    public volatile static WatekMiniatury watekminiatury;
+    public volatile static WatekWczytaj watekwczytaj;
+    public volatile static WatekRysuj watekrysuj;
+    public volatile static WatekOdlicz watekodlicz;
+    public volatile static WatekAnimacja watekanimacja;
 
     public AppService() {
         wateklistujpliki = null;
@@ -25,6 +30,7 @@ public class AppService extends Service {
         watekodlicz = null;
         watekanimacja = null;
         service = this;
+        PlikLogu.otworzLog();
     }
 
     @Nullable
@@ -59,71 +65,52 @@ public class AppService extends Service {
         return START_NOT_STICKY;
     }
 
-    private void zakonczWatekListujPliki() {
-        wateklistujpliki.zakoncz = true;
-        wateklistujpliki.interrupt();
-        while(wateklistujpliki.isAlive()) {
+    private void czekajNaZakonczenie(Thread watek) {
+        watek.interrupt();
+        while(watek.isAlive()) {
             try {
-                wateklistujpliki.join();
+                watek.join();
             } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
+    }
+
+    private void zakonczWatekListujPliki() {
+        wateklistujpliki.zakoncz = true;
+        czekajNaZakonczenie(wateklistujpliki);
+        wateklistujpliki = null;
     }
 
     private void zakonczWatekMiniatury() {
         watekminiatury.zakoncz = true;
         watekminiatury.przerwij = true;
-        watekminiatury.interrupt();
-        while(watekminiatury.isAlive()) {
-            try {
-                watekminiatury.join();
-            } catch (InterruptedException e) {
-            }
-        }
+        czekajNaZakonczenie(watekminiatury);
+        watekminiatury = null;
     }
 
     private void zakonczWatekWczytaj() {
         watekwczytaj.zakoncz = true;
-        watekwczytaj.interrupt();
-        while(watekwczytaj.isAlive()) {
-            try {
-                watekwczytaj.join();
-            } catch (InterruptedException e) {
-            }
-        }
+        czekajNaZakonczenie(watekwczytaj);
+        watekwczytaj = null;
     }
 
     private void zakonczWatekRysuj() {
         watekrysuj.zakoncz = true;
-        watekrysuj.interrupt();
-        while(watekrysuj.isAlive()) {
-            try {
-                watekrysuj.join();
-            } catch (InterruptedException e) {
-            }
-        }
+        czekajNaZakonczenie(watekrysuj);
+        watekrysuj = null;
     }
 
     private void zakonczWatekOdlicz() {
         watekodlicz.zakoncz = true;
-        watekodlicz.interrupt();
-        while(watekodlicz.isAlive()) {
-            try {
-                watekodlicz.join();
-            } catch (InterruptedException e) {
-            }
-        }
+        czekajNaZakonczenie(watekodlicz);
+        watekodlicz = null;
     }
 
     private void zakonczWatekAnimacja() {
         watekanimacja.zakoncz = true;
-        watekanimacja.interrupt();
-        while(watekanimacja.isAlive()) {
-            try {
-                watekanimacja.join();
-            } catch (InterruptedException e) {
-            }
-        }
+        czekajNaZakonczenie(watekanimacja);
+        watekanimacja = null;
     }
 
     private void odmontujKatalog() {
@@ -142,6 +129,7 @@ public class AppService extends Service {
         zakonczWatekOdlicz();
         zakonczWatekAnimacja();
         odmontujKatalog();
+        PlikLogu.zamknijLog();
         Toast.makeText(MainActivity.activity.getApplicationContext(), "Zakonczono Pokaz2!", Toast.LENGTH_SHORT).show();
     }
 

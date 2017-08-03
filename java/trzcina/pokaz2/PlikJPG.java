@@ -2,8 +2,6 @@ package trzcina.pokaz2;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
-
 import java.io.File;
 import java.io.IOException;
 import it.sephiroth.android.library.exif2.ExifInterface;
@@ -120,11 +118,16 @@ public class PlikJPG {
     public boolean zaladuj() {
         try {
             uzupelnijOrient();
+            PlikLogu.zapiszDoLogu("Otwieram: " + sciezka);
+            long start = System.currentTimeMillis();
             bitmapa = BitmapFactory.decodeFile(sciezka);
+            long czas = System.currentTimeMillis() - start;
+            PlikLogu.zapiszDoLogu("Wczytalem: " + sciezka + " Czas: " + czas);
             uzupelnijExif();
             uzupelnijKroki();
             return true;
         } catch (OutOfMemoryError error) {
+            PlikLogu.zapiszDoLogu("Blad wczytywania: " + sciezka);
             return false;
         }
     }

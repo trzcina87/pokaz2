@@ -4,18 +4,17 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
 
 import static android.view.Gravity.CENTER;
 
+@SuppressWarnings({"PointlessBooleanExpression", "ForLoopReplaceableByForEach"})
 public class WatekListujPliki extends Thread {
 
     public volatile boolean zakoncz;
@@ -91,7 +90,7 @@ public class WatekListujPliki extends Thread {
         obrazminiatury.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(AppService.service.wateklistujpliki.zajety) {
+                if(AppService.wateklistujpliki.zajety) {
                     MainActivity.wyswietlToast("Zaczekaj na wczytanie plikow!");
                 } else {
                     if (katalog) {
@@ -101,24 +100,24 @@ public class WatekListujPliki extends Thread {
                             } else {
                                 WatekMiniatury.przerwijMiniatury();
                                 MainActivity.folderroboczy = montowaniete;
-                                AppService.service.wateklistujpliki.focusnawstecz = true;
-                                AppService.service.wateklistujpliki.odswiezfoldery = true;
+                                AppService.wateklistujpliki.focusnawstecz = true;
+                                AppService.wateklistujpliki.odswiezfoldery = true;
                             }
                         } else {
                             WatekMiniatury.przerwijMiniatury();
                             MainActivity.folderroboczy = (String) view.getTag();
-                            AppService.service.wateklistujpliki.focusnawstecz = true;
-                            AppService.service.wateklistujpliki.odswiezfoldery = true;
+                            AppService.wateklistujpliki.focusnawstecz = true;
+                            AppService.wateklistujpliki.odswiezfoldery = true;
                         }
                     } else {
                         WatekMiniatury.przerwijMiniatury();
                         MainActivity.trybopcji = false;
                         OpcjeProgramu.zapiszOpcje();
-                        AppService.service.watekwczytaj.przeladuj = true;
-                        AppService.service.watekwczytaj.zacznijod = (String)view.getTag();
-                        AppService.service.watekrysuj.odswiez = true;
+                        AppService.watekwczytaj.przeladuj = true;
+                        AppService.watekwczytaj.zacznijod = (String)view.getTag();
+                        AppService.watekrysuj.odswiez = true;
                         Widoki.activitylayout.removeView(Widoki.opcjelayout);
-                        AppService.service.watekodlicz.ostatniczas = 2 * System.currentTimeMillis();
+                        AppService.watekodlicz.ostatniczas = 2 * System.currentTimeMillis();
                     }
                 }
             }
@@ -156,7 +155,7 @@ public class WatekListujPliki extends Thread {
         String obecnyplik = null;
         if(focusnawstecz == false) {
             try {
-                obecnyplik = AppService.service.watekwczytaj.pliki[MainActivity.ktoryplik].sciezka;
+                obecnyplik = AppService.watekwczytaj.pliki[MainActivity.ktoryplik].sciezka;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -220,7 +219,7 @@ public class WatekListujPliki extends Thread {
                 MainActivity.widocznoscPostepuOpcje(View.VISIBLE, Color.RED);
                 wyswietlZawartoscFolderu();
                 MainActivity.widocznoscPostepuOpcje(View.INVISIBLE, Color.RED);
-                AppService.service.watekminiatury.odswiezminiatury = System.currentTimeMillis();
+                AppService.watekminiatury.odswiezminiatury = System.currentTimeMillis();
                 odswiezfoldery = false;
                 zajety = false;
             }

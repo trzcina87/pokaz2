@@ -7,13 +7,13 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.media.ExifInterface;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import java.io.IOException;
 
+@SuppressWarnings("PointlessBooleanExpression")
 public class WatekMiniatury extends Thread {
 
     public volatile boolean zakoncz;
@@ -30,7 +30,7 @@ public class WatekMiniatury extends Thread {
     }
 
     public static void przerwijMiniatury() {
-        AppService.service.watekminiatury.przerwij = true;
+        AppService.watekminiatury.przerwij = true;
     }
 
     private int pobierzOrient(it.sephiroth.android.library.exif2.ExifInterface exiflib) {

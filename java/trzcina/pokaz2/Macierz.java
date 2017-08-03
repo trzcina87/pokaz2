@@ -4,7 +4,7 @@ import android.graphics.Matrix;
 
 public class Macierz extends Matrix {
 
-    public float powiekszenie;
-    public int lewo;
-    public int gora;
+    public volatile float powiekszenie;
+    public volatile int lewo;
+    public volatile int gora;
 }

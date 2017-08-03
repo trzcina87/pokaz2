@@ -5,10 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.provider.Settings;
-import android.util.Log;
-import android.widget.AbsoluteLayout;
 
+@SuppressWarnings("PointlessBooleanExpression")
 public class WatekRysuj extends Thread {
 
     public volatile boolean zakoncz;
@@ -54,11 +52,6 @@ public class WatekRysuj extends Thread {
         paintfilter = new Paint(Paint.FILTER_BITMAP_FLAG);
     }
 
-    /*private int obliczDlugoscProporcjonalnie(int dlugosc, int wysokosc, int docelowawysokosc) {
-        double ratio = (double)dlugosc / (double)wysokosc;
-        return (int) (ratio * (float)docelowawysokosc);
-    }*/
-
     public static boolean czyPionowyObraz(int dlugosc, int wysokosc) {
         double ratio = (double)dlugosc / (double)wysokosc;
         if(ratio < MainActivity.ratio) {
@@ -68,27 +61,8 @@ public class WatekRysuj extends Thread {
         }
     }
 
-    /*private Rect wysrodkujRect(int dlugosc, int wysokosc) {
-        Rect rect = new Rect();
-        int roznicawpoziomie = dlugosc - MainActivity.rozdzielczosc.x;
-        int roznicawpionie = wysokosc - MainActivity.rozdzielczosc.y;
-        int dx = 0;
-        int dy = 0;
-        if(roznicawpoziomie > 0) {
-            dx = (int)(((double)roznicawpoziomie / (double)40) * (double)MainActivity.xprzesun);
-        }
-        if(roznicawpionie > 0) {
-            dy = (int) (((double)roznicawpionie / (double)40) * (double)MainActivity.yprzesun);
-        }
-        rect.left = MainActivity.rozdzielczosc.x / 2 - dlugosc / 2 - dx;
-        rect.top = MainActivity.rozdzielczosc.y / 2 - wysokosc / 2 - dy;
-        rect.right = rect.left + dlugosc;
-        rect.bottom = rect.top + wysokosc;
-        return rect;
-    }*/
-
     private void naniesInfo(Canvas canvas, int ktoryplik) {
-        String exif = AppService.service.watekwczytaj.pliki[ktoryplik].exif;
+        String exif = AppService.watekwczytaj.pliki[ktoryplik].exif;
         if (MainActivity.poziominfo == 1) {
             canvas.drawText(exif, 2, MainActivity.rozdzielczosc.y - 2, paintexifwhite);
         }
@@ -108,7 +82,7 @@ public class WatekRysuj extends Thread {
 
     private void zwolnijCanvas(Canvas canvas) {
         if(canvas != null) {
-            MainActivity.surface.surfaceHolder.unlockCanvasAndPost(canvas);
+            MainActivity.surface.surfaceholder.unlockCanvasAndPost(canvas);
         }
     }
 
@@ -193,28 +167,8 @@ public class WatekRysuj extends Thread {
         return matrix;
     }
 
-    private Macierz stworzMacierzDlaAnimacji(int dlugosc, int wysokosc) {
-        Macierz matrix = new Macierz();
-        int lewo = (MainActivity.rozdzielczosc.x - dlugosc) / 2;
-        int gora = (MainActivity.rozdzielczosc.y - wysokosc) / 2;
-        lewo = lewo - MainActivity.xprzesun * ((dlugosc - MainActivity.rozdzielczosc.x) / 2 / 10);
-        gora = gora - MainActivity.yprzesun * ((wysokosc - MainActivity.rozdzielczosc.y) / 2 / 10);
-        lewo = poprawLewo(lewo, dlugosc);
-        gora = poprawGora(gora, wysokosc);
-        matrix.postTranslate(lewo, gora);
-        matrix.lewo = lewo;
-        matrix.gora = gora;
-        matrix.postTranslate(AppService.service.watekanimacja.x, AppService.service.watekanimacja.y);
-        return matrix;
-    }
-
     private float znajdzSkaleMiniatury(int dlugosc, int wysokosc) {
         float powiekszenie;
-        /*if(czyPionowyObraz(dlugosc, wysokosc)) {
-            powiekszenie = MainActivity.rozdzielczosc.y / (float)5 / (float) wysokosc;
-        } else {
-            powiekszenie = MainActivity.rozdzielczosc.x / (float)5 / (float) dlugosc;
-        }*/
         int max = Math.max(wysokosc, dlugosc);
         powiekszenie = 300 / (float)max;
         return powiekszenie;
@@ -284,7 +238,7 @@ public class WatekRysuj extends Thread {
         Macierz matrix = new Macierz();
         obrocMacierz(matrix, kat, dlugosc, wysokosc);
         matrix.postScale(powiekszenie, powiekszenie);
-        AppService.service.watekwczytaj.pliki[ktoryplik].bitmapaslajd = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        AppService.watekwczytaj.pliki[ktoryplik].bitmapaslajd = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
     public static boolean czyAnimowac() {
@@ -300,18 +254,27 @@ public class WatekRysuj extends Thread {
         int wysokosc = bitmapaslajd.getHeight();
         int lewo = (MainActivity.rozdzielczosc.x - dlugosc) / 2;
         int gora = (MainActivity.rozdzielczosc.y - wysokosc) / 2;
-        lewo = poprawLewo(lewo, dlugosc) + AppService.service.watekanimacja.x;
-        gora = poprawGora(gora, wysokosc) + AppService.service.watekanimacja.y;
-        MainActivity.uzupelnijParametryAbsoluteLayout(bitmapaslajd.getWidth(), bitmapaslajd.getHeight(), lewo, gora);
+        lewo = poprawLewo(lewo, dlugosc) + AppService.watekanimacja.x;
+        gora = poprawGora(gora, wysokosc) + AppService.watekanimacja.y;
+        Canvas canvas = null;
+        try {
+            canvas = MainActivity.surface.surfaceholder.lockCanvas();
+            canvas.drawColor(Color.BLACK);
+            canvas.drawBitmap(bitmapaslajd, lewo, gora, null);
+            MainActivity.surface.surfaceholder.unlockCanvasAndPost(canvas);
+        } catch (Exception e) {
+            e.printStackTrace();
+            odswiez = true;
+            zwolnijCanvas(canvas);
+        }
     }
 
     private void rysujObraz(final int ktoryplik) {
         Canvas canvas = null;
         try {
-            Bitmap bitmapa = AppService.service.watekwczytaj.pliki[ktoryplik].bitmapa;
-            Bitmap bitmapaslajd = AppService.service.watekwczytaj.pliki[ktoryplik].bitmapaslajd;
-            int kat = AppService.service.watekwczytaj.pliki[ktoryplik].orient;
-            String sciezka = AppService.service.watekwczytaj.pliki[ktoryplik].sciezka;
+            Bitmap bitmapa = AppService.watekwczytaj.pliki[ktoryplik].bitmapa;
+            Bitmap bitmapaslajd = AppService.watekwczytaj.pliki[ktoryplik].bitmapaslajd;
+            int kat = AppService.watekwczytaj.pliki[ktoryplik].orient;
             if(bitmapa != null) {
                 int dlugosc = bitmapa.getWidth();
                 int wysokosc = bitmapa.getHeight();
@@ -322,15 +285,12 @@ public class WatekRysuj extends Thread {
                 if(czyAnimowac()) {
                     if(bitmapaslajd == null) {
                         uzupelnijBitmapeSlajd(ktoryplik, kat, dlugosc, wysokosc, bitmapa);
-                        bitmapaslajd = AppService.service.watekwczytaj.pliki[ktoryplik].bitmapaslajd;
-                    }
-                    if(! sciezka.equals(Widoki.imageviewanimacja.getTag())) {
-                        MainActivity.uzupelnijTagIBitmapeDoAnimacji(sciezka, bitmapaslajd);
+                        bitmapaslajd = AppService.watekwczytaj.pliki[ktoryplik].bitmapaslajd;
                     }
                     animujBitmape(bitmapaslajd);
                 } else {
                     Macierz macierz = stworzMacierz(kat, dlugosc, wysokosc);
-                    canvas = MainActivity.surface.surfaceHolder.lockCanvas();
+                    canvas = MainActivity.surface.surfaceholder.lockCanvas();
                     canvas.drawColor(Color.BLACK);
                     if (MainActivity.powiekszenie == 100) {
                         canvas.drawBitmap(bitmapa, macierz, null);
@@ -341,11 +301,10 @@ public class WatekRysuj extends Thread {
                         rysujPodglad(canvas, bitmapa, macierz, dlugosc, wysokosc, kat);
                     }
                     naniesInfo(canvas, ktoryplik);
-                    MainActivity.surface.surfaceHolder.unlockCanvasAndPost(canvas);
+                    MainActivity.surface.surfaceholder.unlockCanvasAndPost(canvas);
                 }
-                if(AppService.service.watekodlicz.ostatniczas > System.currentTimeMillis()) {
-                    Log.e("ODLICZ", "Aktualizuje ostatniczas: " + System.currentTimeMillis());
-                    AppService.service.watekodlicz.ostatniczas = System.currentTimeMillis();
+                if(AppService.watekodlicz.ostatniczas > System.currentTimeMillis()) {
+                    AppService.watekodlicz.ostatniczas = System.currentTimeMillis();
                 }
                 MainActivity.ukryjKlepsydre();
             } else {
@@ -362,10 +321,10 @@ public class WatekRysuj extends Thread {
     private void rysujBrakPlikow() {
         Canvas canvas = null;
         try {
-            canvas = MainActivity.surface.surfaceHolder.lockCanvas();
+            canvas = MainActivity.surface.surfaceholder.lockCanvas();
             canvas.drawColor(Color.BLACK);
             canvas.drawText("BRAK PLIKÓW", 0, MainActivity.rozdzielczosc.y - 2, paintbrakplikow);
-            MainActivity.surface.surfaceHolder.unlockCanvasAndPost(canvas);
+            MainActivity.surface.surfaceholder.unlockCanvasAndPost(canvas);
             MainActivity.ukryjKlepsydre();
         } catch (Exception e) {
             e.printStackTrace();
@@ -377,7 +336,7 @@ public class WatekRysuj extends Thread {
     public void run() {
         while(zakoncz == false) {
             Rozne.czekaj(1);
-            if(AppService.service.watekwczytaj.iloscplikow > 0) {
+            if(AppService.watekwczytaj.iloscplikow > 0) {
                 int ktoryplikrysowac = MainActivity.ktoryplik;
                 if(odswiez) {
                     odswiez = false;

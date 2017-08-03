@@ -1,7 +1,5 @@
 package trzcina.pokaz2;
 
-import java.io.File;
-
 public class OpcjeProgramu {
 
     public static volatile int pokazslidow;

@@ -40,7 +40,7 @@ public class WatekAnimacja extends Thread {
                 Rozne.czekaj(opoznienie);
                 x = x + dx;
                 y = y + dy;
-                AppService.service.watekrysuj.odswiez = true;
+                AppService.watekrysuj.odswiez = true;
             }
         }
     }

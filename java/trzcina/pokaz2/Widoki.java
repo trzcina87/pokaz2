@@ -1,32 +1,21 @@
 package trzcina.pokaz2;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Rect;
-import android.provider.ContactsContract;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AbsoluteLayout;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.MultiAutoCompleteTextView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 
+@SuppressWarnings("PointlessBooleanExpression")
 public class Widoki {
 
     public static LinearLayout opcjelayout;
-    public static AbsoluteLayout absolutelayout;
     public static RelativeLayout activitylayout;
     public static Button buttonzapisz;
     public static Button buttonanuluj;
@@ -44,7 +33,6 @@ public class Widoki {
     public static ProgressBar progressbaropcje;
     public static ImageView imageviewklepsydra;
     public static ImageView imageviewplaypauza;
-    public static ImageView imageviewanimacja;
 
     public static void znajdzWidoki() {
         LayoutInflater inflater = LayoutInflater.from(MainActivity.activity.getApplicationContext());
@@ -67,28 +55,25 @@ public class Widoki {
         progressbaropcje = (ProgressBar) opcjelayout.findViewById(R.id.progressbaropcje);
         imageviewklepsydra = (ImageView) MainActivity.activity.findViewById(R.id.klepsydra);
         imageviewplaypauza = (ImageView) MainActivity.activity.findViewById(R.id.playpauza);
-        absolutelayout = (AbsoluteLayout)inflater.inflate(R.layout.animacja, null);
-        absolutelayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-        imageviewanimacja = (ImageView) absolutelayout.findViewById(R.id.imageviewanimacja);
     }
 
 
     private static void zapiszClick() {
-        if(AppService.service.wateklistujpliki.zajety == true) {
+        if(AppService.wateklistujpliki.zajety == true) {
             MainActivity.wyswietlToast("Zaczekaj na wczytanie plikow!");
         } else {
             WatekMiniatury.przerwijMiniatury();
             MainActivity.trybopcji = false;
             OpcjeProgramu.zapiszOpcje();
-            AppService.service.watekwczytaj.przeladuj = true;
-            AppService.service.watekrysuj.odswiez = true;
+            AppService.watekwczytaj.przeladuj = true;
+            AppService.watekrysuj.odswiez = true;
             activitylayout.removeView(opcjelayout);
-            AppService.service.watekodlicz.ostatniczas = 2 * System.currentTimeMillis();
+            AppService.watekodlicz.ostatniczas = 2 * System.currentTimeMillis();
         }
     }
 
     private static void anulujClick() {
-        if(AppService.service.wateklistujpliki.zajety == true) {
+        if(AppService.wateklistujpliki.zajety == true) {
             MainActivity.wyswietlToast("Zaczekaj na wczytanie plikow!");
         } else {
             WatekMiniatury.przerwijMiniatury();
@@ -110,16 +95,16 @@ public class Widoki {
         boolean hostzyje = Proces.dostepnoscIP(WakeOnLan.TEIP);
         if(hostzyje == false) {
             MainActivity.wyswietlToast("Host " + WakeOnLan.TEIP + " nie odpowiada!");
-            AppService.service.wateklistujpliki.montowaniete = null;
+            AppService.wateklistujpliki.montowaniete = null;
         } else {
             Long milisekundy = System.currentTimeMillis();
             String milisek = String.valueOf(milisekundy);
             boolean wynikmontowania = Proces.montuj(milisekundy);
             if(wynikmontowania == true) {
-                AppService.service.wateklistujpliki.montowaniete = "/sdcard/" + milisek + "/" + milisek + "/" + milisek + "/";
+                AppService.wateklistujpliki.montowaniete = "/sdcard/" + milisek + "/" + milisek + "/" + milisek + "/";
                 MainActivity.wyswietlToast("Zamontowano " + WakeOnLan.TEIP);
             } else {
-                AppService.service.wateklistujpliki.montowaniete = null;
+                AppService.wateklistujpliki.montowaniete = null;
                 MainActivity.wyswietlToast("Błąd podczas montowania " + WakeOnLan.TEIP);
             }
         }

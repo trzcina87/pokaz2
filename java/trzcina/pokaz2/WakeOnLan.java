@@ -18,6 +18,7 @@ public class WakeOnLan {
                 bajty[i] = (byte)Integer.parseInt(tablicahex[i], 16);
             }
         } catch (NumberFormatException e) {
+            e.printStackTrace();
         }
         return bajty;
     }
@@ -35,6 +36,7 @@ public class WakeOnLan {
         try {
             address = InetAddress.getByName("192.168.0.255");
         } catch (UnknownHostException e) {
+            e.printStackTrace();
         }
         return new DatagramPacket(bytes, bytes.length, address, 9);
     }

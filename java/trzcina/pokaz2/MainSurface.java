@@ -4,12 +4,12 @@ import android.view.SurfaceView;
 import android.view.SurfaceHolder;
 
 public class MainSurface extends SurfaceView {
-    public SurfaceHolder surfaceHolder;
+    public SurfaceHolder surfaceholder;
 
     public MainSurface(final MainActivity activity) {
         super(activity);
-        surfaceHolder = getHolder();
-        surfaceHolder.addCallback(new SurfaceHolder.Callback(){
+        surfaceholder = getHolder();
+        surfaceholder.addCallback(new SurfaceHolder.Callback(){
 
             @Override
             public void surfaceCreated(SurfaceHolder holder) {

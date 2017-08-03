@@ -3,6 +3,7 @@ package trzcina.pokaz2;
 import java.io.File;
 import java.util.Random;
 
+@SuppressWarnings({"PointlessBooleanExpression", "ForLoopReplaceableByForEach", "ManualArrayCopy"})
 public class WatekWczytaj extends Thread {
 
     public volatile boolean zakoncz;
@@ -158,7 +159,7 @@ public class WatekWczytaj extends Thread {
             if(przeladuj) {
                 wczytajPliki();
                 MainActivity.ktoryplik = 0;
-                AppService.service.watekrysuj.odswiez = true;
+                AppService.watekrysuj.odswiez = true;
             }
             if(iloscplikow > 0) {
                 int ktoryplikwczytac = MainActivity.ktoryplik;

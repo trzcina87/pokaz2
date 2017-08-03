@@ -8,13 +8,10 @@ import android.graphics.Point;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Layout;
-import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AbsoluteLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -24,13 +21,13 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Random;
 
+@SuppressWarnings("PointlessBooleanExpression")
 public class MainActivity extends AppCompatActivity {
 
     public static MainActivity activity;
     public static Point rozdzielczosc;
     public static double ratio;
     public static MainSurface surface;
-
     public static volatile int poziominfo;
     public static volatile int powiekszenie;
     public static volatile int xprzesun;
@@ -105,11 +102,11 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean obsluzEnter(int key) {
         if (Arrays.asList(Kody.ENTERY).contains(key)) {
-            if (!trybopcji) {
+            if (trybopcji == false) {
                 Widoki.activitylayout.addView(Widoki.opcjelayout);
                 Widoki.wypelnijOpcje();
-                AppService.service.wateklistujpliki.focusnawstecz = false;
-                AppService.service.wateklistujpliki.odswiezfoldery = true;
+                AppService.wateklistujpliki.focusnawstecz = false;
+                AppService.wateklistujpliki.odswiezfoldery = true;
                 trybopcji = true;
                 return true;
             }
@@ -121,26 +118,26 @@ public class MainActivity extends AppCompatActivity {
         if (Arrays.asList(Kody.LEWO).contains(key)) {
             if(trybopcji == false) {
                 if (MainActivity.powiekszenie == 0) {
-                    int iloscplikow = AppService.service.watekwczytaj.iloscplikow;
+                    int iloscplikow = AppService.watekwczytaj.iloscplikow;
                     if (iloscplikow > 0) {
                         ktoryplik = ktoryplik - 1;
                         if (ktoryplik < 0) {
                             ktoryplik = iloscplikow - 1;
                         }
                         resetujPrzesuj();
-                        AppService.service.watekodlicz.ostatniczas = 2 * System.currentTimeMillis();
+                        AppService.watekodlicz.ostatniczas = 2 * System.currentTimeMillis();
                         if(WatekRysuj.czyAnimowac()) {
                             Random random = new Random();
                             int znakx = Rozne.znak(random.nextInt(2));
                             int znaky = Rozne.znak(random.nextInt(2));
-                            AppService.service.watekanimacja.startx = (40 + random.nextInt(61)) * znakx;
-                            AppService.service.watekanimacja.starty = (40 + random.nextInt(61)) * znaky;
-                            AppService.service.watekanimacja.zacznij = true;
+                            AppService.watekanimacja.startx = (40 + random.nextInt(61)) * znakx;
+                            AppService.watekanimacja.starty = (40 + random.nextInt(61)) * znaky;
+                            AppService.watekanimacja.zacznij = true;
                         }
                     }
                 } else {
                     try {
-                        int granica = AppService.service.watekwczytaj.pliki[ktoryplik].ilosckrokowx;
+                        int granica = AppService.watekwczytaj.pliki[ktoryplik].ilosckrokowx;
                         xprzesun = xprzesun - 1;
                         if (xprzesun < -granica) {
                             xprzesun = -granica;
@@ -149,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-                AppService.service.watekrysuj.odswiez = true;
+                AppService.watekrysuj.odswiez = true;
                 return true;
             }
         }
@@ -160,26 +157,26 @@ public class MainActivity extends AppCompatActivity {
         if (Arrays.asList(Kody.PRAWO).contains(key)) {
             if(trybopcji == false) {
                 if (MainActivity.powiekszenie == 0) {
-                    int iloscplikow = AppService.service.watekwczytaj.iloscplikow;
+                    int iloscplikow = AppService.watekwczytaj.iloscplikow;
                     if (iloscplikow > 0) {
                         ktoryplik = ktoryplik + 1;
                         if (ktoryplik >= iloscplikow) {
                             ktoryplik = 0;
                         }
                         resetujPrzesuj();
-                        AppService.service.watekodlicz.ostatniczas = 2 * System.currentTimeMillis();
+                        AppService.watekodlicz.ostatniczas = 2 * System.currentTimeMillis();
                         if(WatekRysuj.czyAnimowac()) {
                             Random random = new Random();
                             int znakx = Rozne.znak(random.nextInt(2));
                             int znaky = Rozne.znak(random.nextInt(2));
-                            AppService.service.watekanimacja.startx = (40 + random.nextInt(61)) * znakx;
-                            AppService.service.watekanimacja.starty = (40 + random.nextInt(61)) * znaky;
-                            AppService.service.watekanimacja.zacznij = true;
+                            AppService.watekanimacja.startx = (40 + random.nextInt(61)) * znakx;
+                            AppService.watekanimacja.starty = (40 + random.nextInt(61)) * znaky;
+                            AppService.watekanimacja.zacznij = true;
                         }
                     }
                 } else {
                     try {
-                        int granica = AppService.service.watekwczytaj.pliki[ktoryplik].ilosckrokowx;
+                        int granica = AppService.watekwczytaj.pliki[ktoryplik].ilosckrokowx;
                         xprzesun = xprzesun + 1;
                         if (xprzesun > granica) {
                             xprzesun = granica;
@@ -188,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-                AppService.service.watekrysuj.odswiez = true;
+                AppService.watekrysuj.odswiez = true;
                 return true;
             }
         }
@@ -200,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
             if(trybopcji == false) {
                 if(MainActivity.powiekszenie != 0) {
                     try {
-                        int granica = AppService.service.watekwczytaj.pliki[ktoryplik].ilosckrokowy;
+                        int granica = AppService.watekwczytaj.pliki[ktoryplik].ilosckrokowy;
                         yprzesun = yprzesun - 1;
                         if (yprzesun < -granica) {
                             yprzesun = -granica;
@@ -209,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-                AppService.service.watekrysuj.odswiez = true;
+                AppService.watekrysuj.odswiez = true;
                 return true;
             }
         }
@@ -221,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
             if(trybopcji == false) {
                 if(MainActivity.powiekszenie != 0) {
                     try {
-                        int granica = AppService.service.watekwczytaj.pliki[ktoryplik].ilosckrokowy;
+                        int granica = AppService.watekwczytaj.pliki[ktoryplik].ilosckrokowy;
                         yprzesun = yprzesun + 1;
                         if (yprzesun > granica) {
                             yprzesun = granica;
@@ -230,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
-                AppService.service.watekrysuj.odswiez = true;
+                AppService.watekrysuj.odswiez = true;
                 return true;
             }
         }
@@ -240,15 +237,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean obsluzSto(int key) {
         if (Arrays.asList(Kody.STO).contains(key)) {
             MainActivity.powiekszenie = 100;
-            AppService.service.watekrysuj.odswiez = true;
-            if(WatekRysuj.czyAnimowac()) {
-                if(Widoki.absolutelayout.getParent() == null) {
-                    Widoki.activitylayout.addView(Widoki.absolutelayout);
-                }
-            } else {
-                uzupelnijTagIBitmapeDoAnimacji(null, null);
-                Widoki.activitylayout.removeView(Widoki.absolutelayout);
-            }
+            AppService.watekrysuj.odswiez = true;
             return true;
         }
         return false;
@@ -257,15 +246,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean obsluzOrg(int key) {
         if (Arrays.asList(Kody.ORG).contains(key)) {
             MainActivity.powiekszenie = 0;
-            AppService.service.watekrysuj.odswiez = true;
-            if(WatekRysuj.czyAnimowac()) {
-                if(Widoki.absolutelayout.getParent() == null) {
-                    Widoki.activitylayout.addView(Widoki.absolutelayout);
-                }
-            } else {
-                uzupelnijTagIBitmapeDoAnimacji(null, null);
-                Widoki.activitylayout.removeView(Widoki.absolutelayout);
-            }
+            AppService.watekrysuj.odswiez = true;
             return true;
         }
         return false;
@@ -274,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean obsluzInfo(int key) {
         if (Arrays.asList(Kody.INFO).contains(key)) {
             MainActivity.poziominfo = (MainActivity.poziominfo + 1) % 5;
-            AppService.service.watekrysuj.odswiez = true;
+            AppService.watekrysuj.odswiez = true;
             return true;
         }
         return false;
@@ -286,30 +267,22 @@ public class MainActivity extends AppCompatActivity {
                 if (OpcjeProgramu.pokazslidow == 1) {
                     OpcjeProgramu.pokazslidow = 0;
                     Ustawienia.zapiszUstawienie("pokazslidow", 0);
-                    AppService.service.watekrysuj.odswiez = true;
+                    AppService.watekrysuj.odswiez = true;
                     ustawPlayPauza();
                 } else {
                     OpcjeProgramu.pokazslidow = 1;
                     Ustawienia.zapiszUstawienie("pokazslidow", 1);
-                    AppService.service.watekodlicz.ostatniczas = 2 * System.currentTimeMillis();
-                    AppService.service.watekrysuj.odswiez = true;
+                    AppService.watekodlicz.ostatniczas = 2 * System.currentTimeMillis();
+                    AppService.watekrysuj.odswiez = true;
                     ustawPlayPauza();
-                }
-                if(WatekRysuj.czyAnimowac()) {
-                    if(Widoki.absolutelayout.getParent() == null) {
-                        Widoki.activitylayout.addView(Widoki.absolutelayout);
-                    }
-                } else {
-                    Widoki.activitylayout.removeView(Widoki.absolutelayout);
-                    uzupelnijTagIBitmapeDoAnimacji(null, null);
                 }
                 if(WatekRysuj.czyAnimowac()) {
                     Random random = new Random();
                     int znakx = Rozne.znak(random.nextInt(2));
                     int znaky = Rozne.znak(random.nextInt(2));
-                    AppService.service.watekanimacja.startx = (40 + random.nextInt(61)) * znakx;
-                    AppService.service.watekanimacja.starty = (40 + random.nextInt(61)) * znaky;
-                    AppService.service.watekanimacja.zacznij = true;
+                    AppService.watekanimacja.startx = (40 + random.nextInt(61)) * znakx;
+                    AppService.watekanimacja.starty = (40 + random.nextInt(61)) * znaky;
+                    AppService.watekanimacja.zacznij = true;
                 }
                 return true;
             }
@@ -322,12 +295,12 @@ public class MainActivity extends AppCompatActivity {
             if (Arrays.asList(Kody.POWIEKSZ).contains(key)) {
                 if(MainActivity.powiekszenie != 0) {
                     MainActivity.powiekszenie = MainActivity.powiekszenie + 10;
-                    AppService.service.watekrysuj.odswiez = true;
+                    AppService.watekrysuj.odswiez = true;
                 }
                 if(MainActivity.powiekszenie == 0) {
                     try {
-                        Bitmap bitmapa = AppService.service.watekwczytaj.pliki[ktoryplik].bitmapa;
-                        int kat = AppService.service.watekwczytaj.pliki[ktoryplik].orient;
+                        Bitmap bitmapa = AppService.watekwczytaj.pliki[ktoryplik].bitmapa;
+                        int kat = AppService.watekwczytaj.pliki[ktoryplik].orient;
                         if(bitmapa != null) {
                             int dlugosc = bitmapa.getWidth();
                             int wysokosc = bitmapa.getHeight();
@@ -341,18 +314,10 @@ public class MainActivity extends AppCompatActivity {
                                 MainActivity.powiekszenie = Rozne.zaokraglijWGoreDo10(MainActivity.rozdzielczosc.x * 100 / dlugosc);
                             }
                         }
-                        AppService.service.watekrysuj.odswiez = true;
+                        AppService.watekrysuj.odswiez = true;
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }
-                if(WatekRysuj.czyAnimowac()) {
-                    if(Widoki.absolutelayout.getParent() == null) {
-                        Widoki.activitylayout.addView(Widoki.absolutelayout);
-                    }
-                } else {
-                    uzupelnijTagIBitmapeDoAnimacji(null, null);
-                    Widoki.activitylayout.removeView(Widoki.absolutelayout);
                 }
                 return true;
             }
@@ -366,15 +331,7 @@ public class MainActivity extends AppCompatActivity {
             if (Arrays.asList(Kody.POMNIEJSZ).contains(key)) {
                 if((MainActivity.powiekszenie != 0) && (MainActivity.powiekszenie != 10)) {
                     MainActivity.powiekszenie = MainActivity.powiekszenie - 10;
-                    AppService.service.watekrysuj.odswiez = true;
-                }
-                if(WatekRysuj.czyAnimowac()) {
-                    if(Widoki.absolutelayout.getParent() == null) {
-                        Widoki.activitylayout.addView(Widoki.absolutelayout);
-                    }
-                } else {
-                    uzupelnijTagIBitmapeDoAnimacji(null, null);
-                    Widoki.activitylayout.removeView(Widoki.absolutelayout);
+                    AppService.watekrysuj.odswiez = true;
                 }
                 return true;
             }
@@ -388,45 +345,18 @@ public class MainActivity extends AppCompatActivity {
             if (Arrays.asList(Kody.ANIMACJA).contains(key)) {
                 animacja = !animacja;
                 if(WatekRysuj.czyAnimowac()) {
-                    if(Widoki.absolutelayout.getParent() == null) {
-                        Widoki.activitylayout.addView(Widoki.absolutelayout);
-                    }
-                } else {
-                    uzupelnijTagIBitmapeDoAnimacji(null, null);
-                    Widoki.activitylayout.removeView(Widoki.absolutelayout);
-                }
-                if(WatekRysuj.czyAnimowac()) {
                     Random random = new Random();
                     int znakx = Rozne.znak(random.nextInt(2));
                     int znaky = Rozne.znak(random.nextInt(2));
-                    AppService.service.watekanimacja.startx = (40 + random.nextInt(61)) * znakx;
-                    AppService.service.watekanimacja.starty = (40 + random.nextInt(61)) * znaky;
-                    AppService.service.watekanimacja.zacznij = true;
+                    AppService.watekanimacja.startx = (40 + random.nextInt(61)) * znakx;
+                    AppService.watekanimacja.starty = (40 + random.nextInt(61)) * znaky;
+                    AppService.watekanimacja.zacznij = true;
                 }
-                AppService.service.watekrysuj.odswiez = true;
+                AppService.watekrysuj.odswiez = true;
                 return true;
             }
         }
         return false;
-    }
-
-    public static void uzupelnijTagIBitmapeDoAnimacji(final String tag, final Bitmap bitmapa) {
-        MainActivity.activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Widoki.imageviewanimacja.setImageBitmap(bitmapa);
-                Widoki.imageviewanimacja.setTag(tag);
-            }
-        });
-    }
-
-    public static void uzupelnijParametryAbsoluteLayout(final int dlugosc, final int wysokosc, final int lewo, final int gora) {
-        MainActivity.activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Widoki.imageviewanimacja.setLayoutParams(new AbsoluteLayout.LayoutParams(dlugosc, wysokosc, lewo, gora));
-            }
-        });
     }
 
     private void ustawPlayPauza() {
@@ -512,7 +442,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (trybopcji) {
-            if (AppService.service.wateklistujpliki.zajety == true) {
+            if (AppService.wateklistujpliki.zajety == true) {
                 MainActivity.wyswietlToast("Zaczekaj na wczytanie plikow!");
             } else {
                 if(Widoki.layoutscrollviewminiatury.getFocusedChild() != null) {
@@ -524,8 +454,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     folderroboczy = wstecz;
                     WatekMiniatury.przerwijMiniatury();
-                    AppService.service.wateklistujpliki.focusnawstecz = true;
-                    AppService.service.wateklistujpliki.odswiezfoldery = true;
+                    AppService.wateklistujpliki.focusnawstecz = true;
+                    AppService.wateklistujpliki.odswiezfoldery = true;
                 } else {
                     WatekMiniatury.przerwijMiniatury();
                     Widoki.activitylayout.removeView(Widoki.opcjelayout);
