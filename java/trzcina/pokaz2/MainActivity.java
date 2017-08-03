@@ -4,10 +4,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.graphics.Path;
 import android.graphics.Point;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
@@ -93,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
     private void ustawWidoki() {
         Widoki.znajdzWidoki();
         Widoki.przypiszAkcjeDoWidokow();
+        ustawPlayPauza(5000);
     }
 
     public void resetujPrzesuj() {
@@ -114,17 +117,6 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    private void zacznijAnimacjeJesliTrzeba() {
-        if(WatekRysuj.czyAnimowac()) {
-            Random random = new Random();
-            int znakx = Rozne.znak(random.nextInt(2));
-            int znaky = Rozne.znak(random.nextInt(2));
-            AppService.watekanimacja.startx = (10 + random.nextInt(91)) * znakx;
-            AppService.watekanimacja.starty = (10 + random.nextInt(91)) * znaky;
-            AppService.watekanimacja.zacznij = true;
-        }
-    }
-
     private boolean obsluzLewo(int key) {
         if (Arrays.asList(Kody.LEWO).contains(key)) {
             if(trybopcji == false) {
@@ -137,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         resetujPrzesuj();
                         AppService.watekodlicz.ostatniczas = 2 * System.currentTimeMillis();
-                        zacznijAnimacjeJesliTrzeba();
+                        WatekAnimacja.zacznijAnimacjeJesliTrzeba();
                     }
                 } else {
                     try {
@@ -169,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         resetujPrzesuj();
                         AppService.watekodlicz.ostatniczas = 2 * System.currentTimeMillis();
-                        zacznijAnimacjeJesliTrzeba();
+                        WatekAnimacja.zacznijAnimacjeJesliTrzeba();
                     }
                 } else {
                     try {
@@ -265,15 +257,15 @@ public class MainActivity extends AppCompatActivity {
                     OpcjeProgramu.pokazslidow = 0;
                     Ustawienia.zapiszUstawienie("pokazslidow", 0);
                     AppService.watekrysuj.odswiez = true;
-                    ustawPlayPauza();
+                    ustawPlayPauza(2000);
                 } else {
                     OpcjeProgramu.pokazslidow = 1;
                     Ustawienia.zapiszUstawienie("pokazslidow", 1);
                     AppService.watekodlicz.ostatniczas = 2 * System.currentTimeMillis();
                     AppService.watekrysuj.odswiez = true;
-                    ustawPlayPauza();
+                    ustawPlayPauza(2000);
                 }
-                zacznijAnimacjeJesliTrzeba();
+                WatekAnimacja.zacznijAnimacjeJesliTrzeba();
                 return true;
             }
         }
@@ -334,7 +326,36 @@ public class MainActivity extends AppCompatActivity {
         if(trybopcji == false) {
             if (Arrays.asList(Kody.ANIMACJA).contains(key)) {
                 animacja = !animacja;
-                zacznijAnimacjeJesliTrzeba();
+                WatekAnimacja.zacznijAnimacjeJesliTrzeba();
+                AppService.watekrysuj.odswiez = true;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean obsluzCzas(int key) {
+        if(trybopcji == false) {
+            if(Arrays.asList(Kody.CZAS).contains(key)) {
+                int czastymczasowy = 2;
+                if(OpcjeProgramu.czaszdjecia == 2) {
+                    czastymczasowy = 3;
+                }
+                if(OpcjeProgramu.czaszdjecia == 3) {
+                    czastymczasowy = 5;
+                }
+                if(OpcjeProgramu.czaszdjecia == 5) {
+                    czastymczasowy = 7;
+                }
+                if(OpcjeProgramu.czaszdjecia == 7) {
+                    czastymczasowy = 10;
+                }
+                if(OpcjeProgramu.czaszdjecia == 10) {
+                    czastymczasowy = 2;
+                }
+                OpcjeProgramu.czaszdjecia = czastymczasowy;
+                Ustawienia.zapiszUstawienie("czaszdjecia", czastymczasowy);
+                ustawPlayPauza(2000);
                 AppService.watekrysuj.odswiez = true;
                 return true;
             }
@@ -351,7 +372,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void ustawPlayPauza() {
+    private void ustawPlayPauza(final int opoznienie) {
         final long lokalnaostatniapauza = System.currentTimeMillis();
         ostatniapauza = lokalnaostatniapauza;
         if(OpcjeProgramu.pokazslidow == 1) {
@@ -359,13 +380,16 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Widoki.imageviewplaypauza.setImageResource(R.mipmap.pauza);
         }
+        Widoki.textviewczaszdjecia.setText(OpcjeProgramu.czaszdjecia + "s");
         schowajPokazWidok(Widoki.imageviewplaypauza, View.VISIBLE);
+        schowajPokazWidok(Widoki.textviewczaszdjecia, View.VISIBLE);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Rozne.czekaj(2000);
+                Rozne.czekaj(opoznienie);
                 if(ostatniapauza == lokalnaostatniapauza) {
                     schowajPokazWidok(Widoki.imageviewplaypauza, View.INVISIBLE);
+                    schowajPokazWidok(Widoki.textviewczaszdjecia, View.INVISIBLE);
                 }
             }
         }).start();
@@ -411,6 +435,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
             if(obsluzAnimacja(key)) {
+                return true;
+            }
+            if(obsluzCzas(key)) {
                 return true;
             }
         }

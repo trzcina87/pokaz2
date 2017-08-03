@@ -1,7 +1,5 @@
 package trzcina.pokaz2;
 
-import java.util.Random;
-
 @SuppressWarnings("PointlessBooleanExpression")
 public class WatekOdlicz extends Thread {
 
@@ -29,14 +27,7 @@ public class WatekOdlicz extends Thread {
                             ostatniczas = 2 * System.currentTimeMillis();
                             AppService.watekrysuj.odswiez = true;
                         }
-                        if(WatekRysuj.czyAnimowac()) {
-                            Random random = new Random();
-                            int znakx = Rozne.znak(random.nextInt(2));
-                            int znaky = Rozne.znak(random.nextInt(2));
-                            AppService.watekanimacja.startx = (40 + random.nextInt(61)) * znakx;
-                            AppService.watekanimacja.starty = (40 + random.nextInt(61)) * znaky;
-                            AppService.watekanimacja.zacznij = true;
-                        }
+                        WatekAnimacja.zacznijAnimacjeJesliTrzeba();
                     }
                 }
             }

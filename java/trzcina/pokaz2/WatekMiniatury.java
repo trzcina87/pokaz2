@@ -73,6 +73,13 @@ public class WatekMiniatury extends Thread {
         }
     }
 
+    private void rysujBladMiniatury(ImageView miniatura) {
+        Bitmap bitmapaminiatury = Bitmap.createBitmap(MainActivity.rozdzielczosc.x / 10, MainActivity.rozdzielczosc.x / 10, Bitmap.Config.ARGB_8888);
+        Canvas canvasminiatury = new Canvas(bitmapaminiatury);
+        canvasminiatury.drawBitmap(Bitmapy.jpgbitmapbrakminiatury, null, new Rect(0, 0, MainActivity.rozdzielczosc.x / 10, MainActivity.rozdzielczosc.x / 10), null);
+        MainActivity.ustawBitmapeWImageView(miniatura, bitmapaminiatury);
+    }
+
     private void ustawMiniature(ImageView miniatura) {
         try {
             ExifInterface exifjava = new ExifInterface(miniatura.getTag().toString());
@@ -87,9 +94,14 @@ public class WatekMiniatury extends Thread {
                 naniesMiniatureNaBitmape(miniaturazexif, cc);
                 if(miniaturazexif != null) {
                     MainActivity.ustawBitmapeWImageView(miniatura, thumb);
+                } else {
+                    rysujBladMiniatury(miniatura);
                 }
+            } else {
+                rysujBladMiniatury(miniatura);
             }
         } catch (IOException e) {
+            rysujBladMiniatury(miniatura);
             e.printStackTrace();
         }
     }

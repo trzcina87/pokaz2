@@ -1,20 +1,39 @@
 package trzcina.pokaz2;
 
+import java.util.Random;
+
+@SuppressWarnings("PointlessBooleanExpression")
 public class WatekAnimacja extends Thread {
 
-    public volatile boolean zakoncz;
-    public volatile int startx;
-    public volatile int starty;
-    public volatile int x;
-    public volatile int y;
-    public volatile long startanimacji;
-    public volatile boolean zacznij;
-    public volatile int czaszdjecia;
+    public static volatile boolean zakoncz;
+    public static volatile int startx;
+    public static volatile int starty;
+    public static volatile int x;
+    public static volatile int y;
+    public static volatile long startanimacji;
+    public static volatile boolean zacznij;
+    public static volatile int czaszdjecia;
 
     public WatekAnimacja() {
         zakoncz = false;
         zacznij = false;
         startanimacji = 0;
+        czaszdjecia = 2000;
+        startx = 0;
+        starty = 0;
+        x = 0;
+        y = 0;
+    }
+
+    public static void zacznijAnimacjeJesliTrzeba() {
+        if(WatekRysuj.czyAnimowac()) {
+            Random random = new Random();
+            int znakx = Rozne.znak(random.nextInt(2));
+            int znaky = Rozne.znak(random.nextInt(2));
+            startx = (10 + random.nextInt(91)) * znakx;
+            starty = (10 + random.nextInt(91)) * znaky;
+            zacznij = true;
+        }
     }
 
     public void run() {

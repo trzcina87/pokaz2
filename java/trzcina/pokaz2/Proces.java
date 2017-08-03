@@ -2,7 +2,12 @@ package trzcina.pokaz2;
 
 import java.io.File;
 
+@SuppressWarnings("FieldCanBeLocal")
 public class Proces {
+
+    private static String SHPATH = "/system/bin/sh";
+    private static String MOUNTCOMMAND = "/sdcard/montujpokaz2.sh";
+    private static String UNMOUNTCOMMAND = "/sdcard/odmontujpokaz2.sh";
 
     public static int ping(String address) {
         try {
@@ -27,7 +32,7 @@ public class Proces {
     public static boolean montuj(Long milisekundy) {
         String milisek = String.valueOf(milisekundy);
         try {
-            Process process = new ProcessBuilder().redirectErrorStream(true).command("/system/bin/sh", "/sdcard/montujpokaz2.sh", milisek).start();
+            Process process = new ProcessBuilder().redirectErrorStream(true).command(SHPATH, MOUNTCOMMAND, milisek).start();
             int wynik = process.waitFor();
             if(wynik == 0) {
                 return true;
@@ -42,7 +47,7 @@ public class Proces {
     public static boolean odmontuj(String sciezka) {
         try {
             String milisekundy = new File(sciezka).getName();
-            Process process = new ProcessBuilder().redirectErrorStream(true).command("/system/bin/sh", "/sdcard/odmontujpokaz2.sh", milisekundy).start();
+            Process process = new ProcessBuilder().redirectErrorStream(true).command(SHPATH, UNMOUNTCOMMAND, milisekundy).start();
             int wynik = process.waitFor();
             if(wynik == 0) {
                 return true;

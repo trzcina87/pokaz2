@@ -36,4 +36,16 @@
         android:id="@+id/klepsydra2"
         android:visibility="invisible" />
 
+    <TextView
+        android:id="@+id/czaszdjecia"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/playpauza"
+        android:text=""
+        android:includeFontPadding="false"
+        android:lineSpacingExtra="0px"
+        android:visibility="invisible"
+        android:textColor="#29A92D" />
+
 </RelativeLayout>

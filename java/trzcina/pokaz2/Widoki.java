@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 
 @SuppressWarnings("PointlessBooleanExpression")
@@ -33,6 +34,7 @@ public class Widoki {
     public static ProgressBar progressbaropcje;
     public static ImageView imageviewklepsydra;
     public static ImageView imageviewplaypauza;
+    public static TextView textviewczaszdjecia;
 
     public static void znajdzWidoki() {
         LayoutInflater inflater = LayoutInflater.from(MainActivity.activity.getApplicationContext());
@@ -55,6 +57,7 @@ public class Widoki {
         progressbaropcje = (ProgressBar) opcjelayout.findViewById(R.id.progressbaropcje);
         imageviewklepsydra = (ImageView) MainActivity.activity.findViewById(R.id.klepsydra);
         imageviewplaypauza = (ImageView) MainActivity.activity.findViewById(R.id.playpauza);
+        textviewczaszdjecia = (TextView) MainActivity.activity.findViewById(R.id.czaszdjecia);
     }
 
 

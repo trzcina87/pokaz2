@@ -178,6 +178,11 @@ public class WatekRysuj extends Thread {
         int lewoobwodu = (int) (MainActivity.rozdzielczosc.x - powiekszenie * dlugosc - 20 - 5);
         int goraobwodu = (int) (MainActivity.rozdzielczosc.y - powiekszenie * wysokosc - 20 - 5);
         canvas.drawRect(lewoobwodu, goraobwodu, MainActivity.rozdzielczosc.x - 20 + 5, MainActivity.rozdzielczosc.y - 20 + 5, paintobwodmin);
+        String skala = MainActivity.powiekszenie + "%";
+        Rect rozmiarytekstu = new Rect();
+        paintexifwhite.getTextBounds(skala, 0, skala.length(), rozmiarytekstu);
+        canvas.drawRect(lewoobwodu, goraobwodu - rozmiarytekstu.height() - 1, lewoobwodu + rozmiarytekstu.width() + 6, goraobwodu, paintexifwhite);
+        canvas.drawText(skala, lewoobwodu, goraobwodu, paintexifblack);
     }
 
     private void rysujMiniature(Canvas canvas, Bitmap bitmapa, int dlugosc, int wysokosc, float powiekszenie, int kat) {
