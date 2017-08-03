@@ -114,6 +114,17 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    private void zacznijAnimacjeJesliTrzeba() {
+        if(WatekRysuj.czyAnimowac()) {
+            Random random = new Random();
+            int znakx = Rozne.znak(random.nextInt(2));
+            int znaky = Rozne.znak(random.nextInt(2));
+            AppService.watekanimacja.startx = (10 + random.nextInt(91)) * znakx;
+            AppService.watekanimacja.starty = (10 + random.nextInt(91)) * znaky;
+            AppService.watekanimacja.zacznij = true;
+        }
+    }
+
     private boolean obsluzLewo(int key) {
         if (Arrays.asList(Kody.LEWO).contains(key)) {
             if(trybopcji == false) {
@@ -126,14 +137,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         resetujPrzesuj();
                         AppService.watekodlicz.ostatniczas = 2 * System.currentTimeMillis();
-                        if(WatekRysuj.czyAnimowac()) {
-                            Random random = new Random();
-                            int znakx = Rozne.znak(random.nextInt(2));
-                            int znaky = Rozne.znak(random.nextInt(2));
-                            AppService.watekanimacja.startx = (40 + random.nextInt(61)) * znakx;
-                            AppService.watekanimacja.starty = (40 + random.nextInt(61)) * znaky;
-                            AppService.watekanimacja.zacznij = true;
-                        }
+                        zacznijAnimacjeJesliTrzeba();
                     }
                 } else {
                     try {
@@ -165,14 +169,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         resetujPrzesuj();
                         AppService.watekodlicz.ostatniczas = 2 * System.currentTimeMillis();
-                        if(WatekRysuj.czyAnimowac()) {
-                            Random random = new Random();
-                            int znakx = Rozne.znak(random.nextInt(2));
-                            int znaky = Rozne.znak(random.nextInt(2));
-                            AppService.watekanimacja.startx = (40 + random.nextInt(61)) * znakx;
-                            AppService.watekanimacja.starty = (40 + random.nextInt(61)) * znaky;
-                            AppService.watekanimacja.zacznij = true;
-                        }
+                        zacznijAnimacjeJesliTrzeba();
                     }
                 } else {
                     try {
@@ -276,14 +273,7 @@ public class MainActivity extends AppCompatActivity {
                     AppService.watekrysuj.odswiez = true;
                     ustawPlayPauza();
                 }
-                if(WatekRysuj.czyAnimowac()) {
-                    Random random = new Random();
-                    int znakx = Rozne.znak(random.nextInt(2));
-                    int znaky = Rozne.znak(random.nextInt(2));
-                    AppService.watekanimacja.startx = (40 + random.nextInt(61)) * znakx;
-                    AppService.watekanimacja.starty = (40 + random.nextInt(61)) * znaky;
-                    AppService.watekanimacja.zacznij = true;
-                }
+                zacznijAnimacjeJesliTrzeba();
                 return true;
             }
         }
@@ -344,19 +334,21 @@ public class MainActivity extends AppCompatActivity {
         if(trybopcji == false) {
             if (Arrays.asList(Kody.ANIMACJA).contains(key)) {
                 animacja = !animacja;
-                if(WatekRysuj.czyAnimowac()) {
-                    Random random = new Random();
-                    int znakx = Rozne.znak(random.nextInt(2));
-                    int znaky = Rozne.znak(random.nextInt(2));
-                    AppService.watekanimacja.startx = (40 + random.nextInt(61)) * znakx;
-                    AppService.watekanimacja.starty = (40 + random.nextInt(61)) * znaky;
-                    AppService.watekanimacja.zacznij = true;
-                }
+                zacznijAnimacjeJesliTrzeba();
                 AppService.watekrysuj.odswiez = true;
                 return true;
             }
         }
         return false;
+    }
+
+    private static void schowajPokazWidok(final View view, final int visible) {
+        MainActivity.activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                view.setVisibility(visible);
+            }
+        });
     }
 
     private void ustawPlayPauza() {
@@ -367,18 +359,13 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Widoki.imageviewplaypauza.setImageResource(R.mipmap.pauza);
         }
-        Widoki.imageviewplaypauza.setVisibility(View.VISIBLE);
+        schowajPokazWidok(Widoki.imageviewplaypauza, View.VISIBLE);
         new Thread(new Runnable() {
             @Override
             public void run() {
                 Rozne.czekaj(2000);
                 if(ostatniapauza == lokalnaostatniapauza) {
-                    MainActivity.activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Widoki.imageviewplaypauza.setVisibility(View.INVISIBLE);
-                        }
-                    });
+                    schowajPokazWidok(Widoki.imageviewplaypauza, View.INVISIBLE);
                 }
             }
         }).start();
@@ -524,21 +511,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void pokazKlepsydre() {
-        MainActivity.activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Widoki.imageviewklepsydra.setVisibility(View.VISIBLE);
-                Widoki.imageviewklepsydra.bringToFront();
-            }
-        });
+        schowajPokazWidok(Widoki.imageviewklepsydra, View.VISIBLE);
     }
 
     public static void ukryjKlepsydre() {
-        MainActivity.activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Widoki.imageviewklepsydra.setVisibility(View.INVISIBLE);
-            }
-        });
+        schowajPokazWidok(Widoki.imageviewklepsydra, View.INVISIBLE);
     }
 }

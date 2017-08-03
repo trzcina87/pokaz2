@@ -9,55 +9,68 @@ public class WakeOnLan {
 
     public static String TEMAC = "f4:ce:46:fc:b9:5c";
     public static String TEIP = "192.168.0.101";
+    public static String TEBROADCAST = "192.168.0.255";
 
     private static byte[] zamienMAC(String mac)  {
         byte[] bajty = new byte[6];
-        String[] tablicahex = mac.split(":");
         try {
+            String[] tablicahex = mac.split(":");
             for (int i = 0; i < 6; i++) {
                 bajty[i] = (byte)Integer.parseInt(tablicahex[i], 16);
             }
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
         return bajty;
     }
 
-    private static DatagramPacket stworzPakiet(String mac) {
+    private static DatagramPacket stworzPakiet(String mac, String broadcast) {
         byte[] bajtymac = zamienMAC(mac);
-        byte[] bytes = new byte[6 + 16 * bajtymac.length];
-        for (int i = 0; i < 6; i++) {
-            bytes[i] = (byte) 0xff;
+        if(bajtymac != null) {
+            try {
+                byte[] bytes = new byte[6 + 16 * bajtymac.length];
+                for (int i = 0; i < 6; i++) {
+                    bytes[i] = (byte) 0xff;
+                }
+                for (int i = 6; i < bytes.length; i += bajtymac.length) {
+                    System.arraycopy(bajtymac, 0, bytes, i, bajtymac.length);
+                }
+                InetAddress address = InetAddress.getByName(broadcast);
+                return new DatagramPacket(bytes, bytes.length, address, 9);
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+                return null;
+            }
+        } else {
+            return null;
         }
-        for (int i = 6; i < bytes.length; i += bajtymac.length) {
-            System.arraycopy(bajtymac, 0, bytes, i, bajtymac.length);
-        }
-        InetAddress address = null;
-        try {
-            address = InetAddress.getByName("192.168.0.255");
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        return new DatagramPacket(bytes, bytes.length, address, 9);
     }
 
-    private static void wyslijPakiet(DatagramPacket pakiet) {
+    private static boolean wyslijPakiet(DatagramPacket pakiet) {
         try {
             DatagramSocket socket = new DatagramSocket();
             socket.setBroadcast(true);
             socket.send(pakiet);
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
 
-    public static void wyslijWOL(String mac) {
+    public static boolean wyslijWOL(String mac, String broadcast) {
         try {
-            DatagramPacket pakiet = stworzPakiet(mac);
-            wyslijPakiet(pakiet);
-            MainActivity.wyswietlToast("Serwer " + mac + " obudzony!");
+            DatagramPacket pakiet = stworzPakiet(mac, broadcast);
+            if(pakiet != null) {
+                boolean wyslane = wyslijPakiet(pakiet);
+                return wyslane;
+            } else {
+                return false;
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
 }

@@ -1,6 +1,6 @@
 package trzcina.pokaz2;
 
-@SuppressWarnings("ALL")
+@SuppressWarnings("WeakerAccess")
 public class Kody {
 
     public static final Integer[] ENTERY = {66, 23};

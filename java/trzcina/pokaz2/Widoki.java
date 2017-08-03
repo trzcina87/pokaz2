@@ -86,7 +86,12 @@ public class Widoki {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                WakeOnLan.wyslijWOL(WakeOnLan.TEMAC);
+                boolean wyslano = WakeOnLan.wyslijWOL(WakeOnLan.TEMAC, WakeOnLan.TEBROADCAST);
+                if(wyslano) {
+                    MainActivity.wyswietlToast("Serwer " + WakeOnLan.TEMAC + " obudzony!");
+                } else {
+                    MainActivity.wyswietlToast("Blad podczas budzenia serwera " + WakeOnLan.TEMAC + "!");
+                }
             }
         }).start();
     }

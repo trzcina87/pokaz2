@@ -7,14 +7,14 @@ public class WatekAnimacja extends Thread {
     public volatile int starty;
     public volatile int x;
     public volatile int y;
-    public volatile int dx;
-    public volatile int dy;
+    public volatile long startanimacji;
     public volatile boolean zacznij;
-    public volatile int opoznienie;
+    public volatile int czaszdjecia;
 
     public WatekAnimacja() {
         zakoncz = false;
         zacznij = false;
+        startanimacji = 0;
     }
 
     public void run() {
@@ -23,23 +23,22 @@ public class WatekAnimacja extends Thread {
             if(WatekRysuj.czyAnimowac()) {
                 if(zacznij == true) {
                     zacznij = false;
-                    opoznienie = Math.abs((int) (OpcjeProgramu.czaszdjecia * 1000 / (float)(2 * starty)));
                     x = startx;
                     y = starty;
-                    if(startx < 0) {
-                        dx = 1;
-                    } else {
-                        dx = -1;
-                    }
-                    if(starty < 0) {
-                        dy = 1;
-                    } else {
-                        dy = -1;
-                    }
+                    startanimacji = System.currentTimeMillis();
+                    czaszdjecia = OpcjeProgramu.czaszdjecia * 1000;
                 }
-                Rozne.czekaj(opoznienie);
-                x = x + dx;
-                y = y + dy;
+                double procentanimacji = (double)(System.currentTimeMillis() - startanimacji) / (double)czaszdjecia;
+                if(startx < 0) {
+                    x = (int)(startx + procentanimacji * (Math.abs(2 * startx)));
+                } else {
+                    x = (int)(startx - procentanimacji * (Math.abs(2 * startx)));
+                }
+                if(starty < 0) {
+                    y = (int)(starty + procentanimacji * (Math.abs(2 * starty)));
+                } else {
+                    y = (int)(starty - procentanimacji * (Math.abs(2 * starty)));
+                }
                 AppService.watekrysuj.odswiez = true;
             }
         }

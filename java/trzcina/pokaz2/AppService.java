@@ -6,12 +6,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.TimeZone;
-
 public class AppService extends Service {
 
     public volatile static AppService service;
@@ -23,12 +17,7 @@ public class AppService extends Service {
     public volatile static WatekAnimacja watekanimacja;
 
     public AppService() {
-        wateklistujpliki = null;
-        watekminiatury = null;
-        watekwczytaj = null;
-        watekrysuj = null;
-        watekodlicz = null;
-        watekanimacja = null;
+        watkiNaNull();
         service = this;
         PlikLogu.otworzLog();
     }
@@ -79,38 +68,41 @@ public class AppService extends Service {
     private void zakonczWatekListujPliki() {
         wateklistujpliki.zakoncz = true;
         czekajNaZakonczenie(wateklistujpliki);
-        wateklistujpliki = null;
     }
 
     private void zakonczWatekMiniatury() {
         watekminiatury.zakoncz = true;
         watekminiatury.przerwij = true;
         czekajNaZakonczenie(watekminiatury);
-        watekminiatury = null;
     }
 
     private void zakonczWatekWczytaj() {
         watekwczytaj.zakoncz = true;
         czekajNaZakonczenie(watekwczytaj);
-        watekwczytaj = null;
     }
 
     private void zakonczWatekRysuj() {
         watekrysuj.zakoncz = true;
         czekajNaZakonczenie(watekrysuj);
-        watekrysuj = null;
     }
 
     private void zakonczWatekOdlicz() {
         watekodlicz.zakoncz = true;
         czekajNaZakonczenie(watekodlicz);
-        watekodlicz = null;
     }
 
     private void zakonczWatekAnimacja() {
         watekanimacja.zakoncz = true;
         czekajNaZakonczenie(watekanimacja);
+    }
+
+    private void watkiNaNull() {
         watekanimacja = null;
+        watekodlicz = null;
+        watekrysuj = null;
+        watekwczytaj = null;
+        watekminiatury = null;
+        wateklistujpliki = null;
     }
 
     private void odmontujKatalog() {
@@ -124,12 +116,13 @@ public class AppService extends Service {
         super.onDestroy();
         zakonczWatekListujPliki();
         zakonczWatekMiniatury();
-        zakonczWatekWczytaj();
         zakonczWatekRysuj();
+        zakonczWatekWczytaj();
         zakonczWatekOdlicz();
         zakonczWatekAnimacja();
         odmontujKatalog();
         PlikLogu.zamknijLog();
+        watkiNaNull();
         Toast.makeText(MainActivity.activity.getApplicationContext(), "Zakonczono Pokaz2!", Toast.LENGTH_SHORT).show();
     }
 
