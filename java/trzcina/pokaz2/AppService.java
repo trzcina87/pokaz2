@@ -6,8 +6,14 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
 
+import jcifs.smb.NtlmPasswordAuthentication;
+
 public class AppService extends Service {
 
+    public volatile static String smbip;
+    public volatile static String smbudzial;
+    public volatile static String smbuzytkownik;
+    public volatile static String smbhaslo;
     public volatile static AppService service;
     public volatile static WatekListujPliki wateklistujpliki;
     public volatile static WatekMiniatury watekminiatury;
@@ -15,11 +21,13 @@ public class AppService extends Service {
     public volatile static WatekRysuj watekrysuj;
     public volatile static WatekOdlicz watekodlicz;
     public volatile static WatekAnimacja watekanimacja;
+    public volatile static NtlmPasswordAuthentication sambaauth;
 
     public AppService() {
         watkiNaNull();
         service = this;
         PlikLogu.otworzLog();
+        sambaauth = new NtlmPasswordAuthentication("", smbuzytkownik, smbhaslo);
     }
 
     @Nullable
@@ -105,12 +113,6 @@ public class AppService extends Service {
         wateklistujpliki = null;
     }
 
-    private void odmontujKatalog() {
-        if(wateklistujpliki.montowaniete != null) {
-            Proces.odmontuj(wateklistujpliki.montowaniete);
-        }
-    }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -120,7 +122,6 @@ public class AppService extends Service {
         zakonczWatekWczytaj();
         zakonczWatekOdlicz();
         zakonczWatekAnimacja();
-        odmontujKatalog();
         PlikLogu.zamknijLog();
         watkiNaNull();
         Toast.makeText(MainActivity.activity.getApplicationContext(), "Zakonczono Pokaz2!", Toast.LENGTH_SHORT).show();

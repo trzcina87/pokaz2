@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:id="@+id/opcje"
@@ -18,15 +19,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/checkboxpokazslidow"
+            android:theme="@style/AppTheme"
             android:textColor="@android:color/black"
             android:layout_weight="1" />
 
         <CheckBox
-            android:text="Losuj"
+            android:id="@+id/checkboxlosuj"
+            style="@android:style/Widget.CompoundButton.CheckBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/checkboxlosuj"
+            android:theme="@style/AppTheme"
             android:layout_weight="1"
+            android:text="Losuj"
             android:textColor="@android:color/black" />
 
 
@@ -58,6 +62,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/radiobutton2s"
             android:layout_weight="1"
+            android:theme="@style/AppTheme"
             android:textColor="@android:color/black" />
 
         <RadioButton
@@ -66,6 +71,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/radiobutton3s"
             android:layout_weight="1"
+            android:theme="@style/AppTheme"
             android:textColor="@android:color/black" />
 
         <RadioButton
@@ -74,6 +80,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/radiobutton5s"
             android:layout_weight="1"
+            android:theme="@style/AppTheme"
             android:textColor="@android:color/black" />
 
         <RadioButton
@@ -82,6 +89,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/radiobutton7s"
             android:layout_weight="1"
+            android:theme="@style/AppTheme"
             android:textColor="@android:color/black" />
 
         <RadioButton
@@ -90,6 +98,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/radiobutton10s"
             android:layout_weight="1"
+            android:theme="@style/AppTheme"
             android:textColor="@android:color/black" />
 
     </RadioGroup>
@@ -124,6 +133,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:theme="@style/AppTheme"
+            android:backgroundTint="#AAAAAA"
             android:id="@+id/buttonanuluj" />
 
         <Button
@@ -131,6 +142,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:theme="@style/AppTheme"
+            android:backgroundTint="#AAAAAA"
             android:id="@+id/buttonzapisz" />
 
         <Button
@@ -138,14 +151,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:theme="@style/AppTheme"
+            android:backgroundTint="#AAAAAA"
             android:id="@+id/buttonobudzte" />
-
-        <Button
-            android:text="Montuj TE"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/buttonmontujte" />
 
     </LinearLayout>
 
