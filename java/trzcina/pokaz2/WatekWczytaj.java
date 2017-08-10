@@ -3,8 +3,6 @@ package trzcina.pokaz2;
 import java.io.File;
 import java.util.Random;
 
-import jcifs.smb.SmbFile;
-
 @SuppressWarnings({"PointlessBooleanExpression", "ForLoopReplaceableByForEach", "ManualArrayCopy"})
 public class WatekWczytaj extends Thread {
 
@@ -41,33 +39,7 @@ public class WatekWczytaj extends Thread {
         return false;
     }
 
-    private boolean czyPlikJPG(SmbFile plik) {
-        try {
-            if (plik.isFile()) {
-                if (plik.getName().toLowerCase().endsWith(".jpg")) {
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-        return false;
-    }
-
     private int policzPlikiJPG(File[] plikiwkatalogu) {
-        int ilosc = 0;
-        if(plikiwkatalogu != null) {
-            for(int i = 0; i < plikiwkatalogu.length; i++) {
-                if(czyPlikJPG(plikiwkatalogu[i])) {
-                    ilosc = ilosc + 1;
-                }
-            }
-        }
-        return ilosc;
-    }
-
-    private int policzPlikiJPG(SmbFile[] plikiwkatalogu) {
         int ilosc = 0;
         if(plikiwkatalogu != null) {
             for(int i = 0; i < plikiwkatalogu.length; i++) {
@@ -85,27 +57,7 @@ public class WatekWczytaj extends Thread {
         tab[n2] = tmp;
     }
 
-    private void zamienWTab(SmbFile[] tab, int n1, int n2) {
-        SmbFile tmp = tab[n1];
-        tab[n1] = tab[n2];
-        tab[n2] = tmp;
-    }
-
     private void przelosujTablice(File[] plikiwkatalogu) {
-        Random rn = new Random();
-        if(plikiwkatalogu != null) {
-            if(plikiwkatalogu.length > 0) {
-                for(int j = 0; j < 2; j++) {
-                    for (int i = 0; i < plikiwkatalogu.length; i++) {
-                        int n1 = rn.nextInt(plikiwkatalogu.length);
-                        zamienWTab(plikiwkatalogu, i, n1);
-                    }
-                }
-            }
-        }
-    }
-
-    private void przelosujTablice(SmbFile[] plikiwkatalogu) {
         Random rn = new Random();
         if(plikiwkatalogu != null) {
             if(plikiwkatalogu.length > 0) {
@@ -138,73 +90,26 @@ public class WatekWczytaj extends Thread {
         zacznijod = null;
     }
 
-    private void znajdzKlikniety(SmbFile[] plikiwkatalogu) {
-        int klikniety = 0;
-        if(zacznijod != null) {
-            SmbFile[] tabtymczasowa = new SmbFile[plikiwkatalogu.length];
-            for(int i = 0; i < plikiwkatalogu.length; i++) {
-                if(plikiwkatalogu[i].getPath().equals(zacznijod)) {
-                    klikniety = i;
-                }
-            }
-            for(int i = 0; i < plikiwkatalogu.length; i++) {
-                tabtymczasowa[i] = plikiwkatalogu[dodaji(i, plikiwkatalogu.length, klikniety)];
-            }
-            for(int i = 0; i < plikiwkatalogu.length; i++) {
-                plikiwkatalogu[i] = tabtymczasowa[i];
-            }
-        }
-        zacznijod = null;
-    }
-
     private void wczytajNowaListe() {
-        if(MainActivity.folderroboczy.startsWith("/")) {
-            File katalog = new File(MainActivity.folderroboczy);
-            File[] plikiwkatalogu = katalog.listFiles();
-            if(plikiwkatalogu != null) {
-                WatekListujPliki.sortujPliki(plikiwkatalogu);
-            }
-            if(OpcjeProgramu.losuj == 1) {
-                przelosujTablice(plikiwkatalogu);
-            }
-            znajdzKlikniety(plikiwkatalogu);
-            iloscplikow = policzPlikiJPG(plikiwkatalogu);
-            pliki = new PlikJPG[iloscplikow];
-            int aktualnyplik = 0;
-            if(plikiwkatalogu != null) {
-                for(int i = 0; i < plikiwkatalogu.length; i++) {
-                    if(czyPlikJPG(plikiwkatalogu[i])) {
-                        pliki[aktualnyplik] = new PlikJPG();
-                        pliki[aktualnyplik].sciezka = plikiwkatalogu[i].getAbsolutePath();
-                        aktualnyplik = aktualnyplik + 1;
-                    }
+        File katalog = new File(MainActivity.folderroboczy);
+        File[] plikiwkatalogu = katalog.listFiles();
+        if(plikiwkatalogu != null) {
+            WatekListujPliki.sortujPliki(plikiwkatalogu);
+        }
+        if(OpcjeProgramu.losuj == 1) {
+            przelosujTablice(plikiwkatalogu);
+        }
+        znajdzKlikniety(plikiwkatalogu);
+        iloscplikow = policzPlikiJPG(plikiwkatalogu);
+        pliki = new PlikJPG[iloscplikow];
+        int aktualnyplik = 0;
+        if(plikiwkatalogu != null) {
+            for(int i = 0; i < plikiwkatalogu.length; i++) {
+                if(czyPlikJPG(plikiwkatalogu[i])) {
+                    pliki[aktualnyplik] = new PlikJPG();
+                    pliki[aktualnyplik].sciezka = plikiwkatalogu[i].getAbsolutePath();
+                    aktualnyplik = aktualnyplik + 1;
                 }
-            }
-        } else {
-            try {
-                SmbFile katalog = new SmbFile(MainActivity.folderroboczy, AppService.sambaauth);
-                SmbFile[] plikiwkatalogu = katalog.listFiles();
-                if(plikiwkatalogu != null) {
-                    WatekListujPliki.sortujPliki(plikiwkatalogu);
-                }
-                if(OpcjeProgramu.losuj == 1) {
-                    przelosujTablice(plikiwkatalogu);
-                }
-                znajdzKlikniety(plikiwkatalogu);
-                iloscplikow = policzPlikiJPG(plikiwkatalogu);
-                pliki = new PlikJPG[iloscplikow];
-                int aktualnyplik = 0;
-                if(plikiwkatalogu != null) {
-                    for(int i = 0; i < plikiwkatalogu.length; i++) {
-                        if(czyPlikJPG(plikiwkatalogu[i])) {
-                            pliki[aktualnyplik] = new PlikJPG();
-                            pliki[aktualnyplik].sciezka = plikiwkatalogu[i].getPath();
-                            aktualnyplik = aktualnyplik + 1;
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
         przeladuj = false;

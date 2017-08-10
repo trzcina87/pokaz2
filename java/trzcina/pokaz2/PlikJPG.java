@@ -4,13 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.UnknownHostException;
-
 import it.sephiroth.android.library.exif2.ExifInterface;
-import jcifs.smb.SmbException;
-import jcifs.smb.SmbFile;
-import jcifs.smb.SmbFileInputStream;
 
 public class PlikJPG {
 
@@ -49,11 +43,7 @@ public class PlikJPG {
     public void uzupelnijOrient() {
         ExifInterface exifint = new ExifInterface();
         try {
-            if(sciezka.startsWith("/")) {
-                exifint.readExif(sciezka, ExifInterface.Options.OPTION_ALL);
-            } else {
-                exifint.readExif(new SmbFileInputStream(new SmbFile(sciezka, AppService.sambaauth)), ExifInterface.Options.OPTION_ALL);
-            }
+            exifint.readExif(sciezka, ExifInterface.Options.OPTION_ALL);
             if(exifint.getTag(ExifInterface.TAG_ORIENTATION) != null) {
                 int orientzefix = exifint.getTag(ExifInterface.TAG_ORIENTATION).getValueAsInt(0);
                 orient = ExifInterface.getRotationForOrientationValue((short) orientzefix);
@@ -69,11 +59,7 @@ public class PlikJPG {
             exif = new File(sciezka).getName();
             exif = exif + " " + bitmapa.getWidth() + "x" + bitmapa.getHeight();
             try {
-                if(sciezka.startsWith("/")) {
-                    exifint.readExif(sciezka, ExifInterface.Options.OPTION_ALL);
-                } else {
-                    exifint.readExif(new SmbFileInputStream(new SmbFile(sciezka, AppService.sambaauth)), ExifInterface.Options.OPTION_ALL);
-                }
+                exifint.readExif(sciezka, ExifInterface.Options.OPTION_ALL);
                 if (exifint.getTag(ExifInterface.TAG_MODEL) != null) {
                     exif = exif + " " + exifint.getTag(ExifInterface.TAG_MODEL).getValueAsString();
                 }
@@ -134,11 +120,7 @@ public class PlikJPG {
             uzupelnijOrient();
             PlikLogu.zapiszDoLogu("Otwieram: " + sciezka);
             long start = System.currentTimeMillis();
-            if(sciezka.startsWith("/")) {
-                bitmapa = BitmapFactory.decodeFile(sciezka);
-            } else {
-                bitmapa = BitmapFactory.decodeStream(new SmbFileInputStream(new SmbFile(sciezka, AppService.sambaauth)));
-            }
+            bitmapa = BitmapFactory.decodeFile(sciezka);
             long czas = System.currentTimeMillis() - start;
             PlikLogu.zapiszDoLogu("Wczytalem: " + sciezka + " Czas: " + czas);
             uzupelnijExif();
@@ -147,9 +129,6 @@ public class PlikJPG {
         } catch (OutOfMemoryError error) {
             PlikLogu.zapiszDoLogu("Blad wczytywania: " + sciezka);
             return false;
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        return true;
     }
 }

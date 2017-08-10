@@ -4,19 +4,13 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.concurrent.Exchanger;
-
-import jcifs.smb.SmbException;
-import jcifs.smb.SmbFile;
 
 import static android.view.Gravity.CENTER;
 
@@ -27,12 +21,14 @@ public class WatekListujPliki extends Thread {
     public volatile boolean zajety;
     public volatile boolean odswiezfoldery;
     public volatile boolean focusnawstecz;
+    public volatile String montowaniete;
 
     public WatekListujPliki() {
         zakoncz = false;
         zajety = false;
         odswiezfoldery = false;
         focusnawstecz = false;
+        montowaniete = null;
     }
 
     private static void wyczyscScroolView() {
@@ -54,31 +50,6 @@ public class WatekListujPliki extends Thread {
                 }
                 if(file.isFile() && t1.isDirectory()) {
                     return 1;
-                }
-                return 0;
-            }
-        });
-    }
-
-    public static void sortujPliki(SmbFile[] plikiobecne) {
-        Arrays.sort(plikiobecne, new Comparator<SmbFile>() {
-            @Override
-            public int compare(SmbFile file, SmbFile t1) {
-                try {
-                    if (file.isDirectory() && t1.isDirectory()) {
-                        return file.getName().toLowerCase().compareTo(t1.getName().toLowerCase());
-                    }
-                    if (file.isFile() && t1.isFile()) {
-                        return file.getName().toLowerCase().compareTo(t1.getName().toLowerCase());
-                    }
-                    if (file.isDirectory() && t1.isFile()) {
-                        return -1;
-                    }
-                    if (file.isFile() && t1.isDirectory()) {
-                        return 1;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
                 return 0;
             }
@@ -124,14 +95,14 @@ public class WatekListujPliki extends Thread {
                 } else {
                     if (katalog) {
                         if (((String) (view.getTag())).equals("SERWERTE")) {
-                            //if(Proces.dostepnoscIP(AppService.SAMBAIP) == false) {
-                            //    MainActivity.wyswietlToast("Host " + AppService.SAMBAIP + " nie odpowiada!");
-                            //} else {
+                            if (montowaniete == null) {
+                                MainActivity.wyswietlToast("Udział nie zamontowany!");
+                            } else {
                                 WatekMiniatury.przerwijMiniatury();
-                                MainActivity.folderroboczy = "smb://" + AppService.smbip + "/" + AppService.smbudzial + "/";
+                                MainActivity.folderroboczy = montowaniete;
                                 AppService.wateklistujpliki.focusnawstecz = true;
                                 AppService.wateklistujpliki.odswiezfoldery = true;
-                            //}
+                            }
                         } else {
                             WatekMiniatury.przerwijMiniatury();
                             MainActivity.folderroboczy = (String) view.getTag();
@@ -180,15 +151,6 @@ public class WatekListujPliki extends Thread {
         return layoutminiatury;
     }
 
-    public static boolean sprawdzCzyMoznaConfnacSMB(String sciezka) {
-        String udzial = "smb://" + AppService.smbip + "/" + AppService.smbudzial + "/";
-        if((udzial.equals(sciezka)) || (udzial.equals(sciezka + "/"))) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
     public void wyswietlZawartoscFolderu() {
         String obecnyplik = null;
         if(focusnawstecz == false) {
@@ -199,116 +161,52 @@ public class WatekListujPliki extends Thread {
             }
         }
         wyczyscScroolView();
-        if(OpcjeProgramu.folder.startsWith("/")) {
-            if(!new File(OpcjeProgramu.folder).isDirectory()) {
-                OpcjeProgramu.folder = "/";
-                Ustawienia.zapiszUstawienie("folder", "/");
-                MainActivity.folderroboczy = "/";
-            }
-        } else {
-            try {
-                if(!new SmbFile(OpcjeProgramu.folder, AppService.sambaauth).isDirectory()) {
-                    OpcjeProgramu.folder = "/";
-                    Ustawienia.zapiszUstawienie("folder", "/");
-                    MainActivity.folderroboczy = "/";
-                }
-            } catch (Exception e) {
-                OpcjeProgramu.folder = "/";
-                Ustawienia.zapiszUstawienie("folder", "/");
-                MainActivity.folderroboczy = "/";
-            }
+        if(! new File(OpcjeProgramu.folder).isDirectory()) {
+            OpcjeProgramu.folder = "/";
+            Ustawienia.zapiszUstawienie("folder", "/");
+            MainActivity.folderroboczy = "/";
         }
-        if(MainActivity.folderroboczy.startsWith("/")) {
-            int iloscminiatur = 0;
-            LinearLayout rzadminiatur = stworzRzadMiniatur();
-            String wstecz;
-            if (new File(MainActivity.folderroboczy).getParentFile() != null) {
-                wstecz = new File(MainActivity.folderroboczy).getParentFile().getAbsolutePath() + "/";
-            } else {
-                wstecz = "/";
-            }
-            LinearLayout miniaturawstecz = utworzMiniature("..", Bitmapy.folderbitmap, true, wstecz, obecnyplik);
-            if (focusnawstecz) {
-                miniaturawstecz.requestFocus();
-            }
-            MainActivity.dodajViewDoView(rzadminiatur, miniaturawstecz);
-            iloscminiatur = iloscminiatur + 1;
-            LinearLayout miniaturasieciowa = utworzMiniature("TE", Bitmapy.foldersieciowybitmap, true, "SERWERTE", obecnyplik);
-            MainActivity.dodajViewDoView(rzadminiatur, miniaturasieciowa);
-            iloscminiatur = iloscminiatur + 1;
-            LinearLayout miniaturaroot = utworzMiniature("/", Bitmapy.folderroot, true, "/", obecnyplik);
-            MainActivity.dodajViewDoView(rzadminiatur, miniaturaroot);
-            iloscminiatur = iloscminiatur + 1;
-            File katalogobecny = new File(MainActivity.folderroboczy);
-            final File[] plikiobecne = katalogobecny.listFiles();
-            if (plikiobecne != null) {
-                sortujPliki(plikiobecne);
-                for (int i = 0; i < plikiobecne.length; i++) {
-                    if (plikiobecne[i].isDirectory()) {
-                        if (iloscminiatur % 10 == 0) {
-                            rzadminiatur = stworzRzadMiniatur();
-                        }
-                        LinearLayout miniaturafolderu = utworzMiniature(plikiobecne[i].getName(), Bitmapy.folderbitmap, true, plikiobecne[i].getAbsolutePath() + "/", obecnyplik);
-                        MainActivity.dodajViewDoView(rzadminiatur, miniaturafolderu);
-                        iloscminiatur = iloscminiatur + 1;
-                    }
-                    if (plikiobecne[i].isFile() && plikiobecne[i].getName().toLowerCase().endsWith(".jpg")) {
-                        if (iloscminiatur % 10 == 0) {
-                            rzadminiatur = stworzRzadMiniatur();
-                        }
-                        LinearLayout miniaturajpg = utworzMiniature(plikiobecne[i].getName(), Bitmapy.jpgbitmap, false, plikiobecne[i].getAbsolutePath(), obecnyplik);
-                        MainActivity.dodajViewDoView(rzadminiatur, miniaturajpg);
-                        iloscminiatur = iloscminiatur + 1;
-                    }
-                }
-            }
+        File katalogobecny = new File(MainActivity.folderroboczy);
+        final File[] plikiobecne = katalogobecny.listFiles();
+        int iloscminiatur = 0;
+        LinearLayout rzadminiatur = stworzRzadMiniatur();
+        String wstecz;
+        if(new File(MainActivity.folderroboczy).getParentFile() != null) {
+            wstecz = new File(MainActivity.folderroboczy).getParentFile().getAbsolutePath() + "/";
         } else {
-            try {
-                int iloscminiatur = 0;
-                LinearLayout rzadminiatur = stworzRzadMiniatur();
-                String wstecz;
-                if (sprawdzCzyMoznaConfnacSMB(MainActivity.folderroboczy)) {
-                    wstecz = new SmbFile(MainActivity.folderroboczy, AppService.sambaauth).getParent();
-                } else {
-                    wstecz = "smb://" + AppService.smbip + "/" + AppService.smbudzial + "/";
-                }
-                LinearLayout miniaturawstecz = utworzMiniature("..", Bitmapy.folderbitmap, true, wstecz, obecnyplik);
-                if (focusnawstecz) {
-                    miniaturawstecz.requestFocus();
-                }
-                MainActivity.dodajViewDoView(rzadminiatur, miniaturawstecz);
-                iloscminiatur = iloscminiatur + 1;
-                LinearLayout miniaturasieciowa = utworzMiniature("TE", Bitmapy.foldersieciowybitmap, true, "SERWERTE", obecnyplik);
-                MainActivity.dodajViewDoView(rzadminiatur, miniaturasieciowa);
-                iloscminiatur = iloscminiatur + 1;
-                LinearLayout miniaturaroot = utworzMiniature("/", Bitmapy.folderroot, true, "/", obecnyplik);
-                MainActivity.dodajViewDoView(rzadminiatur, miniaturaroot);
-                iloscminiatur = iloscminiatur + 1;
-                SmbFile katalogobecny = new SmbFile(MainActivity.folderroboczy, AppService.sambaauth);
-                final SmbFile[] plikiobecne = katalogobecny.listFiles();
-                if (plikiobecne != null) {
-                    sortujPliki(plikiobecne);
-                    for (int i = 0; i < plikiobecne.length; i++) {
-                        if (plikiobecne[i].isDirectory()) {
-                            if (iloscminiatur % 10 == 0) {
-                                rzadminiatur = stworzRzadMiniatur();
-                            }
-                            LinearLayout miniaturafolderu = utworzMiniature(plikiobecne[i].getName(), Bitmapy.folderbitmap, true, plikiobecne[i].getPath() + "/", obecnyplik);
-                            MainActivity.dodajViewDoView(rzadminiatur, miniaturafolderu);
-                            iloscminiatur = iloscminiatur + 1;
-                        }
-                        if (plikiobecne[i].isFile() && plikiobecne[i].getName().toLowerCase().endsWith(".jpg")) {
-                            if (iloscminiatur % 10 == 0) {
-                                rzadminiatur = stworzRzadMiniatur();
-                            }
-                            LinearLayout miniaturajpg = utworzMiniature(plikiobecne[i].getName(), Bitmapy.jpgbitmap, false, plikiobecne[i].getPath(), obecnyplik);
-                            MainActivity.dodajViewDoView(rzadminiatur, miniaturajpg);
-                            iloscminiatur = iloscminiatur + 1;
-                        }
+            wstecz = "/";
+        }
+        LinearLayout miniaturawstecz = utworzMiniature("..", Bitmapy.folderbitmap, true, wstecz, obecnyplik);
+        if(focusnawstecz) {
+            miniaturawstecz.requestFocus();
+        }
+        MainActivity.dodajViewDoView(rzadminiatur, miniaturawstecz);
+        iloscminiatur = iloscminiatur + 1;
+        LinearLayout miniaturasieciowa = utworzMiniature("TE", Bitmapy.foldersieciowybitmap, true, "SERWERTE", obecnyplik);
+        MainActivity.dodajViewDoView(rzadminiatur, miniaturasieciowa);
+        iloscminiatur = iloscminiatur + 1;
+        LinearLayout miniaturaroot = utworzMiniature("/", Bitmapy.folderroot, true, "/", obecnyplik);
+        MainActivity.dodajViewDoView(rzadminiatur, miniaturaroot);
+        iloscminiatur = iloscminiatur + 1;
+        if(plikiobecne != null) {
+            sortujPliki(plikiobecne);
+            for (int i = 0; i < plikiobecne.length; i++) {
+                if (plikiobecne[i].isDirectory()) {
+                    if (iloscminiatur % 10 == 0) {
+                        rzadminiatur = stworzRzadMiniatur();
                     }
+                    LinearLayout miniaturafolderu = utworzMiniature(plikiobecne[i].getName(), Bitmapy.folderbitmap, true, plikiobecne[i].getAbsolutePath() + "/", obecnyplik);
+                    MainActivity.dodajViewDoView(rzadminiatur, miniaturafolderu);
+                    iloscminiatur = iloscminiatur + 1;
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+                if(plikiobecne[i].isFile() && plikiobecne[i].getName().toLowerCase().endsWith(".jpg")) {
+                    if (iloscminiatur % 10 == 0) {
+                        rzadminiatur = stworzRzadMiniatur();
+                    }
+                    LinearLayout miniaturajpg = utworzMiniature(plikiobecne[i].getName(), Bitmapy.jpgbitmap, false, plikiobecne[i].getAbsolutePath(), obecnyplik);
+                    MainActivity.dodajViewDoView(rzadminiatur, miniaturajpg);
+                    iloscminiatur = iloscminiatur + 1;
+                }
             }
         }
     }

@@ -6,14 +6,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.media.ExifInterface;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import java.io.IOException;
 
-import it.sephiroth.android.library.exif2.ExifInterface;
-import jcifs.smb.SmbFile;
-import jcifs.smb.SmbFileInputStream;
+import java.io.IOException;
 
 @SuppressWarnings("PointlessBooleanExpression")
 public class WatekMiniatury extends Thread {
@@ -84,13 +82,10 @@ public class WatekMiniatury extends Thread {
 
     private void ustawMiniature(ImageView miniatura) {
         try {
-            ExifInterface exiflib = new ExifInterface();
-            if(miniatura.getTag().toString().startsWith("/")) {
-                exiflib.readExif(miniatura.getTag().toString(), it.sephiroth.android.library.exif2.ExifInterface.Options.OPTION_ALL);
-            } else {
-                exiflib.readExif(new SmbFileInputStream(new SmbFile(miniatura.getTag().toString(), AppService.sambaauth)), it.sephiroth.android.library.exif2.ExifInterface.Options.OPTION_ALL);
-            }
-            byte[] imageData = exiflib.getThumbnail();
+            ExifInterface exifjava = new ExifInterface(miniatura.getTag().toString());
+            it.sephiroth.android.library.exif2.ExifInterface exiflib = new it.sephiroth.android.library.exif2.ExifInterface();
+            exiflib.readExif(miniatura.getTag().toString(), it.sephiroth.android.library.exif2.ExifInterface.Options.OPTION_ALL);
+            byte[] imageData = exifjava.getThumbnail();
             if (imageData != null) {
                 int orient = pobierzOrient(exiflib);
                 Bitmap miniaturazexif = wczytajMiniatureIOdwroc(orient, imageData);
@@ -105,7 +100,6 @@ public class WatekMiniatury extends Thread {
             } else {
                 rysujBladMiniatury(miniatura);
             }
-
         } catch (IOException e) {
             rysujBladMiniatury(miniatura);
             e.printStackTrace();

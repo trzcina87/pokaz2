@@ -23,9 +23,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Random;
 
-import jcifs.smb.NtlmPasswordAuthentication;
-import jcifs.smb.SmbFile;
-
 @SuppressWarnings("PointlessBooleanExpression")
 public class MainActivity extends AppCompatActivity {
 
@@ -92,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void wczytajOpcje() {
         OpcjeProgramu.wczytajOpcje();
-        OpcjeProgramu.wczytajUstawienia();
         folderroboczy = OpcjeProgramu.folder;
     }
 
@@ -114,18 +110,6 @@ public class MainActivity extends AppCompatActivity {
                 Widoki.wypelnijOpcje();
                 AppService.wateklistujpliki.focusnawstecz = false;
                 AppService.wateklistujpliki.odswiezfoldery = true;
-                trybopcji = true;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean obsluzUstawienia(int key) {
-        if (Arrays.asList(Kody.USTAWIENIA).contains(key)) {
-            if (trybopcji == false) {
-                Widoki.activitylayout.addView(Widoki.ustawienialayout);
-                Widoki.wypelnijUstawienia();
                 trybopcji = true;
                 return true;
             }
@@ -241,33 +225,27 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean obsluzSto(int key) {
         if (Arrays.asList(Kody.STO).contains(key)) {
-            if(trybopcji == false) {
-                MainActivity.powiekszenie = 100;
-                AppService.watekrysuj.odswiez = true;
-                return true;
-            }
+            MainActivity.powiekszenie = 100;
+            AppService.watekrysuj.odswiez = true;
+            return true;
         }
         return false;
     }
 
     private boolean obsluzOrg(int key) {
         if (Arrays.asList(Kody.ORG).contains(key)) {
-            if(trybopcji == false) {
-                MainActivity.powiekszenie = 0;
-                AppService.watekrysuj.odswiez = true;
-                return true;
-            }
+            MainActivity.powiekszenie = 0;
+            AppService.watekrysuj.odswiez = true;
+            return true;
         }
         return false;
     }
 
     private boolean obsluzInfo(int key) {
         if (Arrays.asList(Kody.INFO).contains(key)) {
-            if(trybopcji == false) {
-                MainActivity.poziominfo = (MainActivity.poziominfo + 1) % 5;
-                AppService.watekrysuj.odswiez = true;
-                return true;
-            }
+            MainActivity.poziominfo = (MainActivity.poziominfo + 1) % 5;
+            AppService.watekrysuj.odswiez = true;
+            return true;
         }
         return false;
     }
@@ -462,9 +440,6 @@ public class MainActivity extends AppCompatActivity {
             if(obsluzCzas(key)) {
                 return true;
             }
-            if(obsluzUstawienia(key)) {
-                return true;
-            }
         }
         return super.dispatchKeyEvent(event);
     }
@@ -481,43 +456,24 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (trybopcji) {
-            if (Widoki.ustawienialayout.getParent() != null) {
-                Widoki.activitylayout.removeView(Widoki.ustawienialayout);
-                OpcjeProgramu.zapiszUstawienia();
-                AppService.sambaauth = new NtlmPasswordAuthentication("", AppService.smbuzytkownik, AppService.smbhaslo);
-                trybopcji = false;
+            if (AppService.wateklistujpliki.zajety == true) {
+                MainActivity.wyswietlToast("Zaczekaj na wczytanie plikow!");
             } else {
-                if (AppService.wateklistujpliki.zajety == true) {
-                    MainActivity.wyswietlToast("Zaczekaj na wczytanie plikow!");
-                } else {
-                    if (Widoki.layoutscrollviewminiatury.getFocusedChild() != null) {
-                        String wstecz;
-                        if(MainActivity.folderroboczy.startsWith("/")) {
-                            if (new File(MainActivity.folderroboczy).getParentFile() != null) {
-                                wstecz = new File(MainActivity.folderroboczy).getParentFile().getAbsolutePath() + "/";
-                            } else {
-                                wstecz = "/";
-                            }
-                        } else {
-                            try {
-                                if (WatekListujPliki.sprawdzCzyMoznaConfnacSMB(MainActivity.folderroboczy)) {
-                                    wstecz = new SmbFile(MainActivity.folderroboczy, AppService.sambaauth).getParent();
-                                } else {
-                                    wstecz = "smb://" + AppService.smbip + "/" + AppService.smbudzial + "/";
-                                }
-                            } catch (Exception e) {
-                                wstecz = "/";
-                            }
-                        }
-                        folderroboczy = wstecz;
-                        WatekMiniatury.przerwijMiniatury();
-                        AppService.wateklistujpliki.focusnawstecz = true;
-                        AppService.wateklistujpliki.odswiezfoldery = true;
+                if(Widoki.layoutscrollviewminiatury.getFocusedChild() != null) {
+                    String wstecz;
+                    if (new File(MainActivity.folderroboczy).getParentFile() != null) {
+                        wstecz = new File(MainActivity.folderroboczy).getParentFile().getAbsolutePath() + "/";
                     } else {
-                        WatekMiniatury.przerwijMiniatury();
-                        Widoki.activitylayout.removeView(Widoki.opcjelayout);
-                        trybopcji = false;
+                        wstecz = "/";
                     }
+                    folderroboczy = wstecz;
+                    WatekMiniatury.przerwijMiniatury();
+                    AppService.wateklistujpliki.focusnawstecz = true;
+                    AppService.wateklistujpliki.odswiezfoldery = true;
+                } else {
+                    WatekMiniatury.przerwijMiniatury();
+                    Widoki.activitylayout.removeView(Widoki.opcjelayout);
+                    trybopcji = false;
                 }
             }
         } else {

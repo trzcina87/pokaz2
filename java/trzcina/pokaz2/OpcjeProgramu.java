@@ -54,37 +54,6 @@ public class OpcjeProgramu {
         wczytajFolder();
     }
 
-    public static void wczytajUstawienia() {
-        String smbip = Ustawienia.wczytajUstawienie("smbip");
-        if(smbip == null) {
-            Ustawienia.zapiszUstawienie("smbip", "127.0.0.1");
-            AppService.smbip = "127.0.0.1";
-        } else {
-            AppService.smbip = smbip;
-        }
-        String smbudzial = Ustawienia.wczytajUstawienie("smbudzial");
-        if(smbudzial == null) {
-            Ustawienia.zapiszUstawienie("smbudzial", "te");
-            AppService.smbudzial = "te";
-        } else {
-            AppService.smbudzial = smbudzial;
-        }
-        String smbuzytkownik = Ustawienia.wczytajUstawienie("smbuzytkownik");
-        if(smbuzytkownik == null) {
-            Ustawienia.zapiszUstawienie("smbuzytkownik", "user");
-            AppService.smbuzytkownik = "user";
-        } else {
-            AppService.smbuzytkownik = smbuzytkownik;
-        }
-        String smbhaslo = Ustawienia.wczytajUstawienie("smbhaslo");
-        if(smbhaslo == null) {
-            Ustawienia.zapiszUstawienie("smbhaslo", "pass");
-            AppService.smbhaslo = "pass";
-        } else {
-            AppService.smbhaslo = smbhaslo;
-        }
-    }
-
     private static void zapiszOpcjePokazSlidow() {
         if(Widoki.checkboxpokazslidow.isChecked()) {
             Ustawienia.zapiszUstawienie("pokazslidow", 1);
@@ -138,16 +107,5 @@ public class OpcjeProgramu {
         zapiszOpcjeLosuj();
         zapiszOpcjeCzas();
         zapiszOpcjeFolder();
-    }
-
-    public static void zapiszUstawienia() {
-        Ustawienia.zapiszUstawienie("smbip", Widoki.smbip.getText().toString());
-        Ustawienia.zapiszUstawienie("smbudzial", Widoki.smbudzial.getText().toString());
-        Ustawienia.zapiszUstawienie("smbuzytkownik", Widoki.smbuzytkownik.getText().toString());
-        Ustawienia.zapiszUstawienie("smbhaslo", Widoki.smbhaslo.getText().toString());
-        AppService.smbip = Widoki.smbip.getText().toString();
-        AppService.smbudzial = Widoki.smbudzial.getText().toString();
-        AppService.smbuzytkownik = Widoki.smbuzytkownik.getText().toString();
-        AppService.smbhaslo = Widoki.smbhaslo.getText().toString();
     }
 }
