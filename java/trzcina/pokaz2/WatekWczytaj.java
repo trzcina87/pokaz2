@@ -21,6 +21,7 @@ public class WatekWczytaj extends Thread {
     }
 
     private void wyczyscObecnePliki() {
+        PlikLogu.zapiszDoLogu("Czyszcze wszystkie bitmapy!");
         if(pliki != null) {
             for(int i = 0; i < pliki.length; i++) {
                 if(pliki[i] != null) {

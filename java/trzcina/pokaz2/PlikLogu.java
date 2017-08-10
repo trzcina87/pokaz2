@@ -12,7 +12,7 @@ public class PlikLogu {
 
     public static void otworzLog() {
         try {
-            pliklogu = new FileWriter("/sdcard/pokaz2.log");
+            pliklogu = new FileWriter("/sdcard/pokaz2.log", true);
         } catch (IOException e) {
             e.printStackTrace();
             pliklogu = null;

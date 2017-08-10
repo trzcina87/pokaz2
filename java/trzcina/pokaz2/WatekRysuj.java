@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.Log;
 
 @SuppressWarnings("PointlessBooleanExpression")
 public class WatekRysuj extends Thread {
@@ -246,6 +247,8 @@ public class WatekRysuj extends Thread {
         AppService.watekwczytaj.pliki[ktoryplik].bitmapaslajd = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
+
+
     public static boolean czyAnimowac() {
         if((MainActivity.animacja == true) && (MainActivity.powiekszenie == 0) && (OpcjeProgramu.pokazslidow == 1)) {
             return true;
@@ -254,7 +257,7 @@ public class WatekRysuj extends Thread {
         }
     }
 
-    private void animujBitmape(final Bitmap bitmapaslajd) {
+    /*private void animujBitmape(final Bitmap bitmapaslajd) {
         int dlugosc = bitmapaslajd.getWidth();
         int wysokosc = bitmapaslajd.getHeight();
         int lewo = (MainActivity.rozdzielczosc.x - dlugosc) / 2;
@@ -272,6 +275,16 @@ public class WatekRysuj extends Thread {
             odswiez = true;
             zwolnijCanvas(canvas);
         }
+    }*/
+
+    private void animujBitmape(final Bitmap bitmapaslajd) {
+        int dlugosc = bitmapaslajd.getWidth();
+        int wysokosc = bitmapaslajd.getHeight();
+        int lewo = (MainActivity.rozdzielczosc.x - dlugosc) / 2;
+        int gora = (MainActivity.rozdzielczosc.y - wysokosc) / 2;
+        lewo = poprawLewo(lewo, dlugosc) + AppService.service.watekanimacja.x;
+        gora = poprawGora(gora, wysokosc) + AppService.service.watekanimacja.y;
+        MainActivity.uzupelnijParametryAbsoluteLayout(bitmapaslajd.getWidth(), bitmapaslajd.getHeight(), lewo, gora);
     }
 
     private void rysujObraz(final int ktoryplik) {
@@ -280,6 +293,7 @@ public class WatekRysuj extends Thread {
             Bitmap bitmapa = AppService.watekwczytaj.pliki[ktoryplik].bitmapa;
             Bitmap bitmapaslajd = AppService.watekwczytaj.pliki[ktoryplik].bitmapaslajd;
             int kat = AppService.watekwczytaj.pliki[ktoryplik].orient;
+            String sciezka = AppService.service.watekwczytaj.pliki[ktoryplik].sciezka;
             if(bitmapa != null) {
                 int dlugosc = bitmapa.getWidth();
                 int wysokosc = bitmapa.getHeight();
@@ -291,6 +305,9 @@ public class WatekRysuj extends Thread {
                     if(bitmapaslajd == null) {
                         uzupelnijBitmapeSlajd(ktoryplik, kat, dlugosc, wysokosc, bitmapa);
                         bitmapaslajd = AppService.watekwczytaj.pliki[ktoryplik].bitmapaslajd;
+                    }
+                    if(! sciezka.equals(Widoki.imageviewanimacja.getTag())) {
+                        MainActivity.uzupelnijTagIBitmapeDoAnimacji(sciezka, bitmapaslajd);
                     }
                     animujBitmape(bitmapaslajd);
                 } else {

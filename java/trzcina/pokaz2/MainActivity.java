@@ -14,6 +14,7 @@ import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AbsoluteLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -227,6 +228,7 @@ public class MainActivity extends AppCompatActivity {
         if (Arrays.asList(Kody.STO).contains(key)) {
             MainActivity.powiekszenie = 100;
             AppService.watekrysuj.odswiez = true;
+            zmienLayoutJesliTrzeba();
             return true;
         }
         return false;
@@ -236,6 +238,7 @@ public class MainActivity extends AppCompatActivity {
         if (Arrays.asList(Kody.ORG).contains(key)) {
             MainActivity.powiekszenie = 0;
             AppService.watekrysuj.odswiez = true;
+            zmienLayoutJesliTrzeba();
             return true;
         }
         return false;
@@ -266,6 +269,7 @@ public class MainActivity extends AppCompatActivity {
                     ustawPlayPauza(2000);
                 }
                 WatekAnimacja.zacznijAnimacjeJesliTrzeba();
+                zmienLayoutJesliTrzeba();
                 return true;
             }
         }
@@ -301,6 +305,7 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
+                zmienLayoutJesliTrzeba();
                 return true;
             }
         }
@@ -315,6 +320,7 @@ public class MainActivity extends AppCompatActivity {
                     MainActivity.powiekszenie = MainActivity.powiekszenie - 10;
                     AppService.watekrysuj.odswiez = true;
                 }
+                zmienLayoutJesliTrzeba();
                 return true;
             }
         }
@@ -328,6 +334,7 @@ public class MainActivity extends AppCompatActivity {
                 animacja = !animacja;
                 WatekAnimacja.zacznijAnimacjeJesliTrzeba();
                 AppService.watekrysuj.odswiez = true;
+                zmienLayoutJesliTrzeba();
                 return true;
             }
         }
@@ -393,6 +400,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }).start();
+    }
+
+    public static void uzupelnijParametryAbsoluteLayout(final int dlugosc, final int wysokosc, final int lewo, final int gora) {
+        MainActivity.activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Widoki.imageviewanimacja.setLayoutParams(new AbsoluteLayout.LayoutParams(dlugosc, wysokosc, lewo, gora));
+            }
+        });
     }
 
 
@@ -502,6 +518,27 @@ public class MainActivity extends AppCompatActivity {
                 rodzic.addView(dziecko);
             }
         });
+    }
+
+    public static void uzupelnijTagIBitmapeDoAnimacji(final String tag, final Bitmap bitmapa) {
+        MainActivity.activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Widoki.imageviewanimacja.setImageBitmap(bitmapa);
+                Widoki.imageviewanimacja.setTag(tag);
+            }
+        });
+    }
+
+    public static void zmienLayoutJesliTrzeba() {
+        if(WatekRysuj.czyAnimowac()) {
+            if(Widoki.absolutelayout.getParent() == null) {
+                Widoki.activitylayout.addView(Widoki.absolutelayout);
+            }
+        } else {
+            Widoki.activitylayout.removeView(Widoki.absolutelayout);
+            uzupelnijTagIBitmapeDoAnimacji(null, null);
+        }
     }
 
     public static void wyczyscScroolView(final LinearLayout layout) {
